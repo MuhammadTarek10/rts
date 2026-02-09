@@ -134,7 +134,7 @@ services:
       - backend
     
   minio:
-    image: bitnamilegacy/minio:latest
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     container_name: minio
     restart: unless-stopped
     ports:
@@ -145,11 +145,10 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      MINIO_API_PORT_NUMBER: "9000"
-      MINIO_SCHEME: "http"
-      MINIO_SERVER_URL: "http://minio:9000"
+      MINIO_BROWSER: "on"
     volumes:
-      - minio_data:/bitnami/minio/data
+      - minio_data:/data
+    command: server /data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -171,32 +170,33 @@ services:
         max-file: "3"
     networks:
       - backend
-      - monitoring
 
-  minio-browser:
-    image: bitnamilegacy/minio-object-browser:latest
-    container_name: minio-browser
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
     restart: unless-stopped
     ports:
-      - "8080:9090"
-    env_file:
-      - .env
-    environment:
-      MINIO_SERVER_HOST: minio
-      MINIO_SERVER_PORT_NUMBER: "9000"
-      MINIO_SERVER_ACCESS_KEY: ${MINIO_ROOT_USER}
-      MINIO_SERVER_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
-    command: server
-    depends_on:
-      minio:
-        condition: service_healthy
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/html:/usr/share/nginx/html
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: '1'
           memory: 512M
         reservations:
-          cpus: '0.1'
+          cpus: '0.25'
           memory: 128M
     logging:
       driver: "json-file"
@@ -204,7 +204,62 @@ services:
         max-size: "10m"
         max-file: "3"
     networks:
+      - backend
       - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      GF_INSTALL_PLUGINS: ${GF_INSTALL_PLUGINS}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - monitoring
+      - backend
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    volumes:
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    depends_on:
+      - nginx
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
       - backend
 
 
@@ -219,3 +274,6 @@ volumes:
   redis_data:
   rabbitmq_data:
   minio_data:
+  grafana_data:
+  certbot_conf:
+  certbot_www:
