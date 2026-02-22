@@ -32,7 +32,7 @@ RUN npm ci --only=production && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 
 # Expose the application port (defaults to 8000 based on validation schema)
-EXPOSE 8000
+EXPOSE 8001
 
 # Start the application
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]
