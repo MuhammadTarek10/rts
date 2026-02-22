@@ -1,5 +1,7 @@
 export const ENVIRONMENT = {
   NODE_ENV: 'app.env',
+  PORT: 'app.port',
+  FRONTEND_URL: 'app.frontend_url',
 
   DATABASE: {
     KEY: 'database',
@@ -11,6 +13,11 @@ export const ENVIRONMENT = {
     ACCESS_EXPIRATION: 'jwt.access_expiration',
     REFRESH_SECRET: 'jwt.refresh_secret',
     REFRESH_EXPIRATION: 'jwt.refresh_expiration',
+  },
+
+  SWAGGER: {
+    USERNAME: 'swagger.user',
+    PASSWORD: 'swagger.password',
   },
 };
 
