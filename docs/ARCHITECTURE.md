@@ -92,13 +92,13 @@ This document outlines the architectural plan for the `vargo` e-commerce applica
 | Service                         | Language       | Port (Internal) | Database                  | Bus      |
 | :------------------------------ | :------------- | :-------------- | :------------------------ | :------- |
 | **Api Gateway** (Nginx/Traefik) | -              | 80/443          | -                         | -        |
-| **Auth**                        | TS/NestJS      | 3001            | Postgres (DB: `auth`)     | RabbitMQ |
-| **Catalog**                     | C#/.NET        | 3002            | Mongo (DB: `catalog`)     | RabbitMQ |
-| **Orders**                      | TS/NestJS      | 3003            | Postgres (DB: `orders`)   | RabbitMQ |
-| **Inventory**                   | Go             | 3004            | Redis + Postgres          | RabbitMQ |
-| **Payment**                     | C#/.NET        | 3005            | Postgres (DB: `payments`) | RabbitMQ |
-| **Notification**                | Go             | 3006            | -                         | RabbitMQ |
-| **AI/ML**                       | Python/FastAPI | 3007            | Postgres (`pgvector`)     | RabbitMQ |
+| **Auth**                        | TS/NestJS      | 8001            | Postgres (DB: `auth`)     | RabbitMQ |
+| **Catalog**                     | C#/.NET        | 8002            | Mongo (DB: `catalog`)     | RabbitMQ |
+| **Orders**                      | TS/NestJS      | 8003            | Postgres (DB: `orders`)   | RabbitMQ |
+| **Inventory**                   | Go             | 8004            | Redis + Postgres          | RabbitMQ |
+| **Payment**                     | C#/.NET        | 8005            | Postgres (DB: `payments`) | RabbitMQ |
+| **Notification**                | Go             | 8006            | -                         | RabbitMQ |
+| **AI/ML**                       | Python/FastAPI | 8007            | Postgres (`pgvector`)     | RabbitMQ |
 
 ## Getting Started
 
