@@ -20,3 +20,10 @@ export const AUTH_STRATEGIES = {
   FACEBOOK: 'facebook',
   LOCAL: 'local',
 };
+
+export const USER_STATUS = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  SUSPENDED: 'suspended',
+};
