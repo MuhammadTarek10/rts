@@ -18,7 +18,6 @@ export const auth = pgTable(
     user_id: uuid('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    email: text('email').notNull(),
     strategy: authStrategy('strategy').notNull(),
     provider_user_id: text('provider_user_id'),
     is_primary: boolean('is_primary').notNull().default(false),

@@ -5,10 +5,11 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "husky": "^9.1.7",
-    "lint-staged": "^16.3.0",
     "@commitlint/cli": "^20.4.2",
-    "@commitlint/config-conventional": "^20.4.2"
+    "@commitlint/config-conventional": "^20.4.2",
+    "eslint": "^10.0.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.0"
   },
   "lint-staged": {
     "services/**/*.ts": [
