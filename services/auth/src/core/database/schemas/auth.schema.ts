@@ -2,7 +2,6 @@ import {
   pgTable,
   index,
   uuid,
-  pgEnum,
   text,
   timestamp,
   integer,
@@ -10,9 +9,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { user } from './user.schema';
 import { relations } from 'drizzle-orm';
-import { AUTH_STRATEGIES } from 'src/common/constants';
-
-export const authStrategy = pgEnum('auth_strategy', AUTH_STRATEGIES);
+import { authStrategy } from './enums';
 
 export const auth = pgTable(
   'auths',
@@ -34,6 +31,7 @@ export const auth = pgTable(
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
+    deleted_at: timestamp('deleted_at'),
   },
   (table) => [
     index('auth_strategy_user_id_idx').on(table.strategy, table.user_id),

@@ -34,3 +34,8 @@ export const USER_STATUS = {
   INACTIVE: 'inactive',
   SUSPENDED: 'suspended',
 };
+
+export const USER_ROLES = {
+  USER: 'user',
+  ADMIN: 'admin',
+};
