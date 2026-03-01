@@ -5,6 +5,7 @@ import { AppRequest } from './types';
 export const CurrentUser = createParamDecorator(
   (data: keyof UserWithSession, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest<AppRequest>();
-    return data ? request.user[data] : request.user;
+    const user = request.user as UserWithSession;
+    return data ? user?.[data] : user;
   },
 );

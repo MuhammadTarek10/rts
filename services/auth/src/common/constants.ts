@@ -39,3 +39,6 @@ export const USER_ROLES = {
   USER: 'user',
   ADMIN: 'admin',
 };
+
+export const LOCKDOWN_THRESHOLD = 5; // failed attempts before lockdown
+export const LOCKDOWN_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds

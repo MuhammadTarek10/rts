@@ -2,7 +2,7 @@ import { index, pgTable, uuid, timestamp, text } from 'drizzle-orm/pg-core';
 import { auth } from './auth.schema';
 import { relations } from 'drizzle-orm';
 
-export const sessions = pgTable(
+export const session = pgTable(
   'sessions',
   {
     id: uuid().primaryKey().defaultRandom(),
@@ -26,9 +26,9 @@ export const sessions = pgTable(
   ],
 );
 
-export const sessionsRelations = relations(sessions, ({ one }) => ({
+export const sessionsRelations = relations(session, ({ one }) => ({
   auth: one(auth, {
-    fields: [sessions.auth_id],
+    fields: [session.auth_id],
     references: [auth.id],
   }),
 }));
