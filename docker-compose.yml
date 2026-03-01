@@ -311,10 +311,12 @@ services:
     environment:
       NODE_ENV: production
       PORT: 8001
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/auth_db
       RABBITMQ_URI: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
       FRONTEND_URL: http://frontend
     ports:
       - "3001:8001"
+    command: sh -c "npm run migrate:prod && node dist/src/main"
     depends_on:
       db:
         condition: service_healthy

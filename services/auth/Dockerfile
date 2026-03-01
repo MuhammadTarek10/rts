@@ -30,6 +30,8 @@ RUN npm ci --only=production && npm cache clean --force
 
 # Copy the built application from the builder stage
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder /app/src/core/database/migrations ./src/core/database/migrations
 
 # Expose the application port (defaults to 8000 based on validation schema)
 EXPOSE 8001
