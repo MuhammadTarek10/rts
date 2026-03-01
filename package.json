@@ -20,6 +20,12 @@
     ],
     "app/**/*.vue": [
       "eslint --fix"
+    ],
+    "services/**/*.go": [
+      "gofumpt -w"
+    ],
+    "services/catalog/**/*.cs": [
+      "dotnet format services/catalog/Catalog.slnx --include"
     ]
   }
 }
