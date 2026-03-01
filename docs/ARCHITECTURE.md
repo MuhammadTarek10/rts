@@ -22,7 +22,7 @@ This document outlines the architectural plan for the `vargo` e-commerce applica
 ### 2. Catalog Service (`/services/catalog`)
 
 - **Role**: Manages products, categories, attributes, and pricing.
-- **Technology**: **.NET 8/9 (C#)**
+- **Technology**: **.NET 10 (C#)**
 - **Reasoning**:
   - **Robustness**: C# provides strong typing and enterprise patterns (DDD) perfect for complex domain logic (product variations, hierarchical categories).
   - **Performance**: Extremely fast for read-heavy workloads.
@@ -67,6 +67,7 @@ This document outlines the architectural plan for the `vargo` e-commerce applica
 - **Technology**: **Go (Golang)**
 - **Reasoning**:
   - **Lightweight Consumer**: It mainly listens to RabbitMQ queues and fires off requests. Go binaries are tiny and efficient for this "fire and forget" workload.
+- **Database**: MongoDB (Document model for notification templates, channel payload metadata, and delivery logs).
 
 ---
 
@@ -97,7 +98,7 @@ This document outlines the architectural plan for the `vargo` e-commerce applica
 | **Orders**                      | TS/NestJS      | 8003            | Postgres (DB: `orders`)   | RabbitMQ |
 | **Inventory**                   | Go             | 8004            | Redis + Postgres          | RabbitMQ |
 | **Payment**                     | C#/.NET        | 8005            | Postgres (DB: `payments`) | RabbitMQ |
-| **Notification**                | Go             | 8006            | -                         | RabbitMQ |
+| **Notification**                | Go             | 8006            | Mongo (DB: `notification`) | RabbitMQ |
 | **AI/ML**                       | Python/FastAPI | 8007            | Postgres (`pgvector`)     | RabbitMQ |
 
 ## Getting Started

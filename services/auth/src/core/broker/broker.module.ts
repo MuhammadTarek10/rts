@@ -16,9 +16,7 @@ import { ENVIRONMENT } from 'src/common/constants';
           options: {
             urls: [config.getOrThrow<string>(ENVIRONMENT.BROKER.URI)],
             queue: ENVIRONMENT.BROKER.QUEUES.AUTH_EVENTS,
-            queueOptions: {
-              durable: true,
-            },
+            queueOptions: { durable: true },
           },
         }),
       },
