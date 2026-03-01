@@ -4,7 +4,7 @@ export const validationSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'production', 'test', 'staging'])
     .default('development'),
-  PORT: z.string().default('8000'),
+  PORT: z.string().default('8001'),
 
   // * Frontend
   FRONTEND_URL: z.url().default('http://localhost:3000'),

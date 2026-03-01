@@ -7,15 +7,15 @@ import { TOKEN } from './types';
 @Injectable()
 export class CookieService {
   private readonly isProduction: boolean;
-  private readonly accessTokenExpiresIn;
-  private readonly refreshTokenExpiresIn;
+  private readonly accessTokenExpiresIn: number;
+  private readonly refreshTokenExpiresIn: number;
 
   constructor(private readonly config: ConfigService) {
     this.isProduction = this.config.get(ENVIRONMENT.NODE_ENV) === 'production';
-    this.accessTokenExpiresIn = this.config.get<number>(
+    this.accessTokenExpiresIn = this.config.getOrThrow<number>(
       ENVIRONMENT.JWT.ACCESS_EXPIRATION,
     );
-    this.refreshTokenExpiresIn = this.config.get<number>(
+    this.refreshTokenExpiresIn = this.config.getOrThrow<number>(
       ENVIRONMENT.JWT.REFRESH_EXPIRATION,
     );
   }

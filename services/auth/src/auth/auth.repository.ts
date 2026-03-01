@@ -83,7 +83,23 @@ export class AuthRepository extends BaseRepository {
     );
   }
 
-  async resetFailedAttempts(user_id: string) {
+  async isAccountLocked(userId: string) {
+    const [authRecord] = await this.executeQuery(
+      this.db.query.auth.findMany({
+        where: (fields, { eq, and }) =>
+          and(
+            eq(fields.user_id, userId),
+            eq(fields.strategy, AUTH_STRATEGIES.LOCAL),
+          ),
+        columns: { locked_until: true },
+      }),
+    );
+
+    if (!authRecord?.locked_until) return false;
+    return new Date() < new Date(authRecord.locked_until);
+  }
+
+  async resetFailedAttempts(userId: string) {
     await this.executeQuery(
       this.db
         .update(auth)
@@ -93,20 +109,20 @@ export class AuthRepository extends BaseRepository {
         })
         .where(
           and(
-            eq(auth.user_id, user_id),
+            eq(auth.user_id, userId),
             eq(auth.strategy, AUTH_STRATEGIES.LOCAL),
           ),
         ),
     );
   }
 
-  async updateFailedAttempts(user_id: string) {
+  async updateFailedAttempts(userId: string) {
     // First, get the current failed_attempts value
     const [authRecord] = await this.executeQuery(
       this.db.query.auth.findMany({
         where: (fields, { eq, and }) =>
           and(
-            eq(fields.user_id, user_id),
+            eq(fields.user_id, userId),
             eq(fields.strategy, AUTH_STRATEGIES.LOCAL),
           ),
         columns: { failed_attempts: true },
@@ -128,7 +144,7 @@ export class AuthRepository extends BaseRepository {
         })
         .where(
           and(
-            eq(auth.user_id, user_id),
+            eq(auth.user_id, userId),
             eq(auth.strategy, AUTH_STRATEGIES.LOCAL),
           ),
         ),

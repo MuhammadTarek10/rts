@@ -12,6 +12,7 @@ import { AUTH_STRATEGIES } from 'src/common/constants';
 import { SessionRepository } from './session.repository';
 import { RefreshTokenPayload } from 'src/core/utils/token/types';
 import { RandomService } from 'src/core/utils/random/random.service';
+import { AuthEventsPublisher } from './auth-events.publisher';
 
 @Injectable()
 export class AuthService {
@@ -21,11 +22,19 @@ export class AuthService {
     private readonly hashService: HashService,
     private readonly tokenService: TokenService,
     private readonly randomService: RandomService,
+    private readonly eventsPublisher: AuthEventsPublisher,
   ) {}
 
   async validateUser(email: string, password: string) {
     const user = await this.repo.findByEmailWithLocalAuth(email);
     if (!user || user.deleted_at) return null;
+
+    const isLocked = await this.repo.isAccountLocked(user.id);
+    if (isLocked) {
+      throw new UnauthorizedException(
+        'Account is locked due to multiple failed login attempts. Please try again later.',
+      );
+    }
 
     if (
       !user.auths.length ||
@@ -49,7 +58,7 @@ export class AuthService {
   }
 
   async signUp(dto: SignUpDto) {
-    return await this.repo.runInTransaction(async () => {
+    const result = await this.repo.runInTransaction(async () => {
       const user = await this.repo.findUserByEmail(dto.email);
       if (user?.deleted_at) this.restoreUser(user);
       if (user) throw new ConflictException('User already Exists');
@@ -64,8 +73,18 @@ export class AuthService {
 
       await this.createSession(sessionId, data.user.id, tokens.refresh_token);
 
-      return tokens;
+      return {
+        tokens,
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+        },
+      };
     });
+
+    this.eventsPublisher.emitUserRegistered(result.user);
+
+    return result.tokens;
   }
 
   async signIn(user: User) {

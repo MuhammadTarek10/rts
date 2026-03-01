@@ -19,6 +19,17 @@ export const ENVIRONMENT = {
     USERNAME: 'swagger.user',
     PASSWORD: 'swagger.password',
   },
+
+  BROKER: {
+    KEY: 'broker',
+    URI: 'broker.RABBITMQ_URI',
+    QUEUES: {
+      AUTH_EVENTS: 'auth.events',
+    },
+    EVENTS: {
+      USER_REGISTERED: 'UserRegistered',
+    },
+  },
 };
 
 export const AUTH_STRATEGIES = {
