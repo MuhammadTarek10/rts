@@ -7,30 +7,36 @@ import { TOKEN } from './types';
 @Injectable()
 export class CookieService {
   private readonly isProduction: boolean;
+  private readonly accessTokenExpiresIn;
+  private readonly refreshTokenExpiresIn;
 
   constructor(private readonly config: ConfigService) {
     this.isProduction = this.config.get(ENVIRONMENT.NODE_ENV) === 'production';
+    this.accessTokenExpiresIn = this.config.get<number>(
+      ENVIRONMENT.JWT.ACCESS_EXPIRATION,
+    );
+    this.refreshTokenExpiresIn = this.config.get<number>(
+      ENVIRONMENT.JWT.REFRESH_EXPIRATION,
+    );
   }
 
   setAuthCookies(
     res: Response,
     accessToken: string,
     refreshToken: string,
-    accessTokenExpiresIn: number,
-    refreshTokenExpiresIn: number,
   ): void {
     const cookieOptions = this.getCookieOptions();
 
     // Set access token cookie
     res.cookie(TOKEN.ACCESS_TOKEN, accessToken, {
       ...cookieOptions,
-      maxAge: accessTokenExpiresIn * 1000,
+      maxAge: this.accessTokenExpiresIn * 1000,
     });
 
     // Set refresh token cookie
     res.cookie(TOKEN.REFRESH_TOKEN, refreshToken, {
       ...cookieOptions,
-      maxAge: refreshTokenExpiresIn * 1000,
+      maxAge: this.refreshTokenExpiresIn * 1000,
     });
   }
 
