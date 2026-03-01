@@ -189,7 +189,7 @@ export class AuthController {
   @ApiCookieAuth('access_token')
   @UseGuards(JwtGuard)
   @HttpCode(HttpStatus.OK)
-  @Post('logout')
+  @Post('sign-out')
   async logout(
     @CurrentUser('id') userId: string,
     @CurrentUser('session_id') sessionId: string,
