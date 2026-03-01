@@ -1,0 +1,90 @@
+############################
+# Build results
+############################
+bin/
+obj/
+out/
+publish/
+TestResults/
+
+############################
+# User-specific files
+############################
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+############################
+# Visual Studio
+############################
+.vs/
+*.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+############################
+# Rider
+############################
+.idea/
+*.sln.iml
+
+############################
+# Logs
+############################
+*.log
+
+############################
+# OS files
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# NuGet
+############################
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+############################
+# Environment files
+############################
+.env
+.env.*
+appsettings.Development.json
+
+############################
+# Coverage & Test
+############################
+coverage/
+*.coverage
+*.coveragexml
+
+############################
+# Azure / Publish
+############################
+*.Publish.xml
+*.azurePubxml
+*.pubxml
+*.publishproj
+
+############################
+# Temporary files
+############################
+*.tmp
+*.temp
+*.cache
+
+############################
+# Resharper
+############################
+_ReSharper*/
+*.DotSettings.user
