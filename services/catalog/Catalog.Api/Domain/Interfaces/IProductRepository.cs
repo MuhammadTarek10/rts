@@ -1,0 +1,26 @@
+using Catalog.Api.Domain.Entities;
+using Catalog.Api.Shared.Abstraction;
+
+namespace Catalog.Api.Domain.Interfaces;
+
+/// <summary>
+/// Repository contract for <see cref="Product"/> persistence with domain-specific queries.
+/// </summary>
+public interface IProductRepository : IRepository<Product>
+{
+    /// <summary>
+    /// Checks whether a product with the given SKU already exists.
+    /// </summary>
+    /// <param name="sku">The SKU to check.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns><c>true</c> if a product with the SKU exists; otherwise <c>false</c>.</returns>
+    Task<bool> ExistsBySkuAsync(string sku, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Checks whether a product with the given slug already exists.
+    /// </summary>
+    /// <param name="slug">The slug to check.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns><c>true</c> if a product with the slug exists; otherwise <c>false</c>.</returns>
+    Task<bool> ExistsBySlugAsync(string slug, CancellationToken cancellationToken = default);
+}

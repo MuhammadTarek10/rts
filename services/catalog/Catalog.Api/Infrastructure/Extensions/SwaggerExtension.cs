@@ -29,7 +29,7 @@ public static class SwaggerExtension
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
-                [new OpenApiSecuritySchemeReference("bearer", document)] = []
+                [new OpenApiSecuritySchemeReference("Bearer", document)] = []
             });
         });
     }
