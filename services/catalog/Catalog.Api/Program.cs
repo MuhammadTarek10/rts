@@ -6,8 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 // * Swagger
 builder.Services.AddSwagger();
 
-builder.Services.AddAuthorization();
-
 builder.Services.AddControllers();
 
 // * Infrastructure
@@ -27,6 +25,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHealthChecks("/health");
 app.MapControllers();
 
 await app.RunAsync();

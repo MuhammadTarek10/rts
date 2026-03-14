@@ -20,26 +20,38 @@ public sealed class Product : IEntity
     public required string Slug { get; init; }
 
     [BsonElement("title")]
-    public required string Title { get; init; }
+    public required string Title { get; set; }
 
     [BsonElement("description")]
-    public string? Description { get; init; }
+    public string? Description { get; set; }
 
     [BsonElement("brandId")]
-    public string? BrandId { get; init; }
+    public string? BrandId { get; set; }
 
     [BsonElement("categoryIds")]
-    public IReadOnlyList<string> CategoryIds { get; init; } = [];
+    public IReadOnlyList<string> CategoryIds { get; set; } = [];
 
     [BsonElement("status")]
     [BsonRepresentation(BsonType.String)]
     public ProductStatus Status { get; private set; } = ProductStatus.Draft;
 
     [BsonElement("price")]
-    public required Money Price { get; init; }
+    public required Money Price { get; set; }
 
     [BsonElement("variants")]
-    public IReadOnlyList<ProductVariant> Variants { get; init; } = [];
+    public IReadOnlyList<ProductVariant> Variants { get; set; } = [];
+
+    [BsonElement("images")]
+    public IReadOnlyList<ProductImage> Images { get; set; } = [];
+
+    [BsonElement("averageRating")]
+    public decimal? AverageRating { get; set; }
+
+    [BsonElement("reviewCount")]
+    public int ReviewCount { get; set; } = 0;
+
+    [BsonElement("tags")]
+    public IReadOnlyList<string> Tags { get; set; } = [];
 
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -82,6 +94,27 @@ public sealed class ProductVariant
 
     [BsonElement("price")]
     public Money? Price { get; init; }
+}
+
+public sealed class ProductImage
+{
+    [BsonElement("imageId")]
+    public string ImageId { get; init; } = Guid.CreateVersion7().ToString();
+
+    [BsonElement("url")]
+    public required string Url { get; init; }
+
+    [BsonElement("key")]
+    public required string Key { get; init; }
+
+    [BsonElement("altText")]
+    public string? AltText { get; init; }
+
+    [BsonElement("sortOrder")]
+    public int SortOrder { get; init; }
+
+    [BsonElement("isPrimary")]
+    public bool IsPrimary { get; init; }
 }
 
 public sealed class Money

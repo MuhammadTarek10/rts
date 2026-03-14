@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Catalog.Api.Shared.Exceptions;
+using MongoDB.Driver;
 
 namespace Catalog.Api.Middlewares;
 
@@ -23,6 +24,11 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         {
             await next(context);
         }
+        catch (NotFoundException ex)
+        {
+            logger.LogWarning(ex, "Not found: {Code} - {Message}", ex.Code, ex.Message);
+            await WriteErrorResponseAsync(context, HttpStatusCode.NotFound, ex.Code, ex.Message);
+        }
         catch (ConflictException ex)
         {
             logger.LogWarning(ex, "Conflict: {Code} - {Message}", ex.Code, ex.Message);
@@ -32,6 +38,11 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         {
             logger.LogWarning(ex, "Domain error: {Code} - {Message}", ex.Code, ex.Message);
             await WriteErrorResponseAsync(context, HttpStatusCode.BadRequest, ex.Code, ex.Message);
+        }
+        catch (MongoException ex)
+        {
+            logger.LogError(ex, "MongoDB error");
+            await WriteErrorResponseAsync(context, HttpStatusCode.ServiceUnavailable, "SERVICE_UNAVAILABLE", "Service temporarily unavailable.");
         }
         catch (Exception ex)
         {

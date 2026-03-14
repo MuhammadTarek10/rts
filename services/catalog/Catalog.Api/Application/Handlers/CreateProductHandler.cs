@@ -1,36 +1,43 @@
 using Catalog.Api.Application.DTOs;
 using Catalog.Api.Domain.Entities;
-using Catalog.Api.Domain.Interfaces;
+using Catalog.Api.Domain.Events;
+using Catalog.Api.Infrastructure;
+using Catalog.Api.Infrastructure.Messaging;
 using Catalog.Api.Shared.Exceptions;
 
 namespace Catalog.Api.Application.Handlers;
 
-/// <summary>
-/// Handles creation of new products, enforcing SKU and slug uniqueness.
-/// </summary>
-public sealed class CreateProductHandler(IProductRepository productRepository, ILogger<CreateProductHandler> logger)
+public sealed class CreateProductHandler(
+    CatalogUnitOfWork uow,
+    ICatalogEventPublisher eventPublisher,
+    ILogger<CreateProductHandler> logger)
 {
-    /// <summary>
-    /// Creates a new product from the given request.
-    /// </summary>
-    /// <param name="request">Product creation data.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>The created product mapped to a response DTO.</returns>
-    /// <exception cref="ConflictException">Thrown when a product with the same SKU or slug already exists.</exception>
     public async Task<ProductResponseDto> HandleAsync(
         CreateProductDto request,
         CancellationToken cancellationToken = default)
     {
-        if (await productRepository.ExistsBySkuAsync(request.Sku, cancellationToken))
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        logger.LogInformation("Creating product {Sku}", request.Sku);
+
+        if (await uow.Products.ExistsBySkuAsync(request.Sku, cancellationToken))
         {
             logger.LogWarning("Product creation conflict: SKU {Sku} already exists", request.Sku);
             throw new ConflictException("DUPLICATE_SKU", "A product with the same SKU already exists.");
         }
 
-        if (await productRepository.ExistsBySlugAsync(request.Slug, cancellationToken))
+        if (await uow.Products.ExistsBySlugAsync(request.Slug, cancellationToken))
         {
             logger.LogWarning("Product creation conflict: slug {Slug} already exists", request.Slug);
             throw new ConflictException("DUPLICATE_SLUG", "A product with the same slug already exists.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.BrandId) && !await uow.Brands.ExistsAsync(request.BrandId, cancellationToken))
+            throw new DomainException("BRAND_NOT_FOUND", $"Brand '{request.BrandId}' does not exist.");
+
+        foreach (var categoryId in request.CategoryIds)
+        {
+            if (await uow.Categories.GetByIdAsync(categoryId, cancellationToken) is null)
+                throw new DomainException("CATEGORY_NOT_FOUND", $"Category '{categoryId}' does not exist.");
         }
 
         var product = new Product
@@ -41,39 +48,15 @@ public sealed class CreateProductHandler(IProductRepository productRepository, I
             Description = request.Description?.Trim(),
             BrandId = request.BrandId?.Trim(),
             CategoryIds = request.CategoryIds,
-            Price = new Money
-            {
-                Amount = request.Amount,
-                Currency = request.Currency.Trim().ToUpperInvariant(),
-            },
+            Price = new Money { Amount = request.Amount, Currency = request.Currency.Trim().ToUpperInvariant() },
         };
 
-        await productRepository.SaveAsync(product, isNew: true, cancellationToken);
+        await uow.Products.SaveAsync(product, isNew: true, cancellationToken);
 
-        logger.LogInformation("Product {ProductId} created with SKU {Sku}", product.Id, product.Sku);
+        var domainEvent = new ProductCreatedEvent(product.Id, product.Sku, product.Title, product.BrandId, product.CategoryIds, product.Price.Amount, product.Price.Currency);
+        await eventPublisher.PublishAsync(domainEvent, cancellationToken);
 
-        return Map(product);
-    }
-
-    /// <summary>
-    /// Maps a <see cref="Product"/> entity to a <see cref="ProductResponseDto"/>.
-    /// </summary>
-    public static ProductResponseDto Map(Product product)
-    {
-        return new ProductResponseDto(
-            product.Id,
-            product.Sku,
-            product.Slug,
-            product.Title,
-            product.Description,
-            product.Price.Amount,
-            product.Price.Currency,
-            product.Status.ToString(),
-            product.BrandId,
-            product.CategoryIds,
-            product.CreatedAt,
-            product.UpdatedAt,
-            product.Version
-        );
+        logger.LogInformation("Product {ProductId} created with SKU {Sku} in {ElapsedMs}ms", product.Id, product.Sku, sw.ElapsedMilliseconds);
+        return ProductResponseDto.FromEntity(product);
     }
 }
