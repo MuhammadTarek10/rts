@@ -25,8 +25,6 @@ public sealed class DeleteProductImageHandler(
         var image = product.Images.FirstOrDefault(i => i.ImageId == imageId)
             ?? throw new NotFoundException("IMAGE_NOT_FOUND", $"Image '{imageId}' not found on product '{productId}'.");
 
-        await imageStorage.DeleteAsync(image.Key, cancellationToken);
-
         var remaining = product.Images.Where(i => i.ImageId != imageId).ToList();
 
         // If deleted image was primary and others exist, promote the lowest-sortorder image
@@ -43,6 +41,10 @@ public sealed class DeleteProductImageHandler(
         product.Images = remaining;
         product.Touch();
         await uow.Products.UpdateAsync(product, cancellationToken);
+
+        // Delete from MinIO after DB is updated — a MinIO orphan is recoverable,
+        // but a broken DB reference (deleted file still in document) is not.
+        await imageStorage.DeleteAsync(image.Key, cancellationToken);
 
         await cache.RemoveAsync($"catalog:product:{productId}", cancellationToken);
         await cache.RemoveAsync($"catalog:product:slug:{product.Slug}", cancellationToken);
