@@ -1,6 +1,7 @@
 using Catalog.Api.Application.DTOs;
 using Catalog.Api.Application.Handlers;
 using Catalog.Api.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.Api.Controllers;
@@ -10,6 +11,7 @@ namespace Catalog.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/products")]
+[Authorize]
 public sealed class ProductsController(CreateProductHandler createProductHandler, IProductRepository productRepository) : ControllerBase
 {
     /// <summary>
