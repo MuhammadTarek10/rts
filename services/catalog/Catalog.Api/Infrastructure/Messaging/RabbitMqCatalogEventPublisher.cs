@@ -68,6 +68,18 @@ public sealed class RabbitMqCatalogEventPublisher(
             if (_channel is { IsOpen: true })
                 return _channel;
 
+            // Dispose old resources before reconnecting
+            if (_channel is not null)
+            {
+                await _channel.DisposeAsync();
+                _channel = null;
+            }
+            if (_connection is not null)
+            {
+                await _connection.DisposeAsync();
+                _connection = null;
+            }
+
             var factory = new ConnectionFactory { Uri = new Uri(_settings.ConnectionString) };
             _connection = await factory.CreateConnectionAsync(cancellationToken);
             _channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);

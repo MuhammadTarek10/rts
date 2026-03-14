@@ -2,8 +2,6 @@ using Catalog.Api.Domain.Entities;
 using Catalog.Api.Domain.Interfaces;
 using Catalog.Api.Domain.Models;
 using Catalog.Api.Shared.Exceptions;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace Catalog.Api.Infrastructure.Repositories;
@@ -90,44 +88,23 @@ public sealed class ProductRepository(IMongoDatabase database, ILogger<ProductRe
     {
         return await ExecuteAsync(async () =>
         {
-            var filterDef = BuildSearchFilter(criteria);
             var skip = (criteria.Page - 1) * criteria.PageSize;
             var limit = criteria.PageSize;
+            var filter = BuildSearchFilter(criteria);
 
-            var pipeline = new[]
-            {
-                new BsonDocument("$match", filterDef.Render(
-                    BsonSerializer.SerializerRegistry.GetSerializer<Product>(),
-                    BsonSerializer.SerializerRegistry)),
-                new BsonDocument("$facet", new BsonDocument
-                {
-                    {
-                        "data", new BsonArray
-                        {
-                            new BsonDocument("$sort", GetSortDocument(criteria.SortBy)),
-                            new BsonDocument("$skip", skip),
-                            new BsonDocument("$limit", limit),
-                        }
-                    },
-                    { "count", new BsonArray { new BsonDocument("$count", "total") } }
-                })
-            };
+            // Count in parallel with paged query
+            var countTask = _products.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
 
-            var aggregateOptions = new AggregateOptions { AllowDiskUse = true };
-            var cursor = await _products.AggregateAsync<BsonDocument>(pipeline, aggregateOptions, cancellationToken);
-            var result = await cursor.FirstOrDefaultAsync(cancellationToken);
+            var sortDefinition = GetSortDefinition(criteria.SortBy);
+            var itemsTask = _products.Find(filter)
+                .Sort(sortDefinition)
+                .Skip(skip)
+                .Limit(limit)
+                .ToListAsync(cancellationToken);
 
-            if (result is null) return (Array.Empty<Product>(), 0L);
+            await Task.WhenAll(countTask, itemsTask);
 
-            var dataArray = result["data"].AsBsonArray;
-            var countArray = result["count"].AsBsonArray;
-
-            var items = dataArray
-                .Select(doc => BsonSerializer.Deserialize<Product>(doc.AsBsonDocument))
-                .ToList();
-            var total = countArray.Count > 0 ? countArray[0]["total"].ToInt64() : 0L;
-
-            return ((IReadOnlyList<Product>)items, total);
+            return ((IReadOnlyList<Product>)itemsTask.Result, countTask.Result);
         }, "Error searching products");
     }
 
@@ -160,11 +137,11 @@ public sealed class ProductRepository(IMongoDatabase database, ILogger<ProductRe
             : Builders<Product>.Filter.And(filters);
     }
 
-    private static BsonDocument GetSortDocument(string? sortBy) => sortBy switch
+    private static SortDefinition<Product> GetSortDefinition(string? sortBy) => sortBy switch
     {
-        "price_asc" => new BsonDocument("price.amount", 1),
-        "price_desc" => new BsonDocument("price.amount", -1),
-        "relevance" => new BsonDocument("score", new BsonDocument("$meta", "textScore")),
-        _ => new BsonDocument("createdAt", -1),
+        "price_asc" => Builders<Product>.Sort.Ascending(p => p.Price.Amount),
+        "price_desc" => Builders<Product>.Sort.Descending(p => p.Price.Amount),
+        "relevance" => Builders<Product>.Sort.MetaTextScore("score"),
+        _ => Builders<Product>.Sort.Descending(p => p.CreatedAt), // newest (default)
     };
 }

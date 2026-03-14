@@ -41,13 +41,21 @@ public sealed class MinioImageStorageService(
 
     public async Task DeleteAsync(string key, CancellationToken cancellationToken = default)
     {
-        var request = new DeleteObjectRequest
+        try
         {
-            BucketName = _settings.BucketName,
-            Key = key,
-        };
+            var request = new DeleteObjectRequest
+            {
+                BucketName = _settings.BucketName,
+                Key = key,
+            };
 
-        await s3Client.DeleteObjectAsync(request, cancellationToken);
-        logger.LogInformation("Image deleted from MinIO: {Key}", key);
+            await s3Client.DeleteObjectAsync(request, cancellationToken);
+            logger.LogInformation("Image deleted from MinIO: {Key}", key);
+        }
+        catch (AmazonS3Exception ex)
+        {
+            logger.LogError(ex, "Failed to delete image from MinIO: {Key}", key);
+            throw;
+        }
     }
 }
