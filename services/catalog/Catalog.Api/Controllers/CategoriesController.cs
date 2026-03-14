@@ -24,7 +24,7 @@ public sealed class CategoriesController(
     public async Task<IActionResult> Create([FromBody] CreateCategoryDto request, CancellationToken cancellationToken)
     {
         var category = await createCategoryHandler.HandleAsync(request, cancellationToken);
-        return CreatedAtAction(nameof(GetTree), null, category);
+        return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
     }
 
     [HttpGet]

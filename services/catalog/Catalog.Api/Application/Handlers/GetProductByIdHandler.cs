@@ -21,6 +21,7 @@ public sealed class GetProductByIdHandler(
 
         var dto = ProductResponseDto.FromEntity(product);
         await cache.SetAsync(cacheKey, dto, TimeSpan.FromMinutes(5), cancellationToken);
+        logger.LogInformation("Product {ProductId} retrieved", id);
         return dto;
     }
 }

@@ -21,6 +21,7 @@ public sealed class GetProductBySlugHandler(
 
         var dto = ProductResponseDto.FromEntity(product);
         await cache.SetAsync(cacheKey, dto, TimeSpan.FromMinutes(5), cancellationToken);
+        logger.LogInformation("Product retrieved by slug {Slug}", slug);
         return dto;
     }
 }

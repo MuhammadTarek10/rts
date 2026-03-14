@@ -1,5 +1,6 @@
 using Amazon.S3;
 using Catalog.Api.Application.Handlers;
+using RabbitMQ.Client;
 using Catalog.Api.Domain.Interfaces;
 using Catalog.Api.Infrastructure.Messaging;
 using Catalog.Api.Infrastructure.Repositories;
@@ -147,8 +148,13 @@ public static class ServiceExtensions
 
         // Health Checks
         services.AddHealthChecks()
-            .AddMongoDb(connectionString)
+            .AddMongoDb(sp => sp.GetRequiredService<IMongoDatabase>())
             .AddRedis(redisConnectionString)
-            .AddRabbitMQ(rabbitConnectionString: configuration["RabbitMq:ConnectionString"] ?? "amqp://guest:guest@localhost:5672");
+            .AddRabbitMQ(sp =>
+            {
+                var rabbitUri = new Uri(configuration["RabbitMq:ConnectionString"] ?? "amqp://guest:guest@localhost:5672");
+                var factory = new ConnectionFactory { Uri = rabbitUri };
+                return factory.CreateConnectionAsync();
+            });
     }
 }
