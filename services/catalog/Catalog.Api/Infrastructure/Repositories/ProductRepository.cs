@@ -1,5 +1,9 @@
 using Catalog.Api.Domain.Entities;
 using Catalog.Api.Domain.Interfaces;
+using Catalog.Api.Domain.Models;
+using Catalog.Api.Shared.Exceptions;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace Catalog.Api.Infrastructure.Repositories;
