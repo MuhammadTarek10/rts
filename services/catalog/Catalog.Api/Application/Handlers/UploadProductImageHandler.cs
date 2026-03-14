@@ -1,3 +1,4 @@
+using System.IO;
 using Catalog.Api.Application.DTOs;
 using Catalog.Api.Domain.Entities;
 using Catalog.Api.Infrastructure;

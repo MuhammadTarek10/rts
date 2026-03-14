@@ -48,9 +48,26 @@ public sealed class UpdateCategoryHandler(
         category.UpdatedAt = DateTime.UtcNow;
 
         await uow.Categories.UpdateAsync(category, cancellationToken);
+        await UpdateDescendantPathsAsync(category, uow, cancellationToken);
         await cache.RemoveAsync("catalog:categories:tree", cancellationToken);
 
         logger.LogInformation("Category {CategoryId} updated", id);
         return CategoryResponseDto.FromEntity(category);
+    }
+
+    private static async Task UpdateDescendantPathsAsync(
+        Domain.Entities.Category parent,
+        CatalogUnitOfWork uow,
+        CancellationToken cancellationToken)
+    {
+        var children = await uow.Categories.GetChildrenAsync(parent.Id, cancellationToken);
+        foreach (var child in children)
+        {
+            child.Path = [..parent.Path, parent.Id];
+            child.Depth = parent.Depth + 1;
+            child.UpdatedAt = DateTime.UtcNow;
+            await uow.Categories.UpdateAsync(child, cancellationToken);
+            await UpdateDescendantPathsAsync(child, uow, cancellationToken); // recurse
+        }
     }
 }

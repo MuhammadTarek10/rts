@@ -19,7 +19,7 @@ public sealed class SearchProductsHandler(
         SearchProductsRequest request,
         CancellationToken cancellationToken = default)
     {
-        var pageSize = Math.Min(request.PageSize, MaxPageSize);
+        var pageSize = Math.Clamp(request.PageSize, 1, MaxPageSize);
         var page = Math.Max(request.Page, 1);
 
         // Expand category to include descendants
