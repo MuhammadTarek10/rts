@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Catalog.Api.Infrastructure.Extensions;
 using Catalog.Api.Middlewares;
 
@@ -6,7 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // * Swagger
 builder.Services.AddSwagger();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+    });
 
 // * Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);

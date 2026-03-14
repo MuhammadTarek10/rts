@@ -12,7 +12,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
     };
 
     /// <summary>
