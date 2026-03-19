@@ -25,7 +25,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "availability"
+                    "Availability"
                 ],
                 "summary": "Bulk check SKU availability",
                 "parameters": [
@@ -71,7 +71,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "availability"
+                    "Availability"
                 ],
                 "summary": "Check SKU availability",
                 "parameters": [
@@ -109,7 +109,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "inventory"
+                    "Inventory"
                 ],
                 "summary": "List inventory items",
                 "parameters": [
@@ -169,7 +169,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "inventory"
+                    "Inventory"
                 ],
                 "summary": "Get inventory item by SKU",
                 "parameters": [
@@ -210,7 +210,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "inventory"
+                    "Inventory"
                 ],
                 "summary": "Get inventory item",
                 "parameters": [
@@ -257,7 +257,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "inventory"
+                    "Inventory"
                 ],
                 "summary": "Update inventory item settings",
                 "parameters": [
@@ -306,50 +306,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/inventory/items/{id}/stock": {
-            "get": {
-                "description": "Get stock levels per warehouse for a specific inventory item",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventory"
-                ],
-                "summary": "Get stock levels for an item",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Inventory item ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.StockLevel"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/middleware.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/middleware.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/inventory/movements": {
             "get": {
                 "description": "List stock movements with filtering. Default 30-day window, max 90 days.",
@@ -357,7 +313,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "List stock movements",
                 "parameters": [
@@ -437,7 +393,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Adjust stock",
                 "parameters": [
@@ -500,7 +456,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Receive stock",
                 "parameters": [
@@ -557,7 +513,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Return stock",
                 "parameters": [
@@ -614,7 +570,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Ship stock",
                 "parameters": [
@@ -677,7 +633,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Transfer stock between warehouses",
                 "parameters": [
@@ -735,7 +691,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Get stock movement",
                 "parameters": [
@@ -784,7 +740,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "reservations"
+                    "Reservations"
                 ],
                 "summary": "Reserve stock",
                 "parameters": [
@@ -841,7 +797,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "reservations"
+                    "Reservations"
                 ],
                 "summary": "Confirm reservation",
                 "parameters": [
@@ -895,7 +851,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "reservations"
+                    "Reservations"
                 ],
                 "summary": "Release reservation",
                 "parameters": [
@@ -946,7 +902,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "reservations"
+                    "Reservations"
                 ],
                 "summary": "Get reservations by order",
                 "parameters": [
@@ -977,6 +933,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/inventory/stock/{id}": {
+            "get": {
+                "description": "Get stock levels per warehouse for a specific inventory item",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Get stock levels for an item",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Inventory item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.StockLevel"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/middleware.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middleware.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/inventory/warehouses": {
             "get": {
                 "description": "Get all warehouses",
@@ -984,7 +984,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "List warehouses",
                 "responses": {
@@ -1019,7 +1019,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "Create warehouse",
                 "parameters": [
@@ -1068,7 +1068,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "Get warehouse",
                 "parameters": [
@@ -1109,7 +1109,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "Update warehouse",
                 "parameters": [
@@ -1165,7 +1165,7 @@ const docTemplate = `{
                 ],
                 "description": "Soft-deactivate a warehouse (Admin only). Rejects if has stock or is default.",
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "Deactivate warehouse",
                 "parameters": [

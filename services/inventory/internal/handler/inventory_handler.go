@@ -21,7 +21,7 @@ func NewInventoryHandler(svc *service.InventoryService) *InventoryHandler {
 // ListItems godoc
 // @Summary List inventory items
 // @Description List all inventory items with optional filtering and pagination
-// @Tags inventory
+// @Tags Inventory
 // @Accept json
 // @Produce json
 // @Param status query string false "Filter by status (active, archived, draft)"
@@ -66,7 +66,7 @@ func (h *InventoryHandler) ListItems(w http.ResponseWriter, r *http.Request) {
 // GetItem godoc
 // @Summary Get inventory item
 // @Description Get a single inventory item with aggregated stock levels
-// @Tags inventory
+// @Tags Inventory
 // @Produce json
 // @Param id path string true "Inventory item ID"
 // @Success 200 {object} domain.InventoryItemWithStock
@@ -86,7 +86,7 @@ func (h *InventoryHandler) GetItem(w http.ResponseWriter, r *http.Request) {
 // GetItemBySKU godoc
 // @Summary Get inventory item by SKU
 // @Description Lookup an inventory item by its SKU
-// @Tags inventory
+// @Tags Inventory
 // @Produce json
 // @Param sku path string true "SKU"
 // @Success 200 {object} domain.InventoryItem
@@ -106,7 +106,7 @@ func (h *InventoryHandler) GetItemBySKU(w http.ResponseWriter, r *http.Request) 
 // GetItemStock godoc
 // @Summary Get stock levels for an item
 // @Description Get stock levels per warehouse for a specific inventory item
-// @Tags inventory
+// @Tags Inventory
 // @Produce json
 // @Param id path string true "Inventory item ID"
 // @Success 200 {array} domain.StockLevel
@@ -129,7 +129,7 @@ func (h *InventoryHandler) GetItemStock(w http.ResponseWriter, r *http.Request) 
 // UpdateItem godoc
 // @Summary Update inventory item settings
 // @Description Update an inventory item's tracking and reorder settings
-// @Tags inventory
+// @Tags Inventory
 // @Accept json
 // @Produce json
 // @Param id path string true "Inventory item ID"

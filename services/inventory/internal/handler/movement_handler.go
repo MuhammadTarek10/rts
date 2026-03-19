@@ -22,7 +22,7 @@ func NewMovementHandler(svc *service.MovementService) *MovementHandler {
 // ListMovements godoc
 // @Summary List stock movements
 // @Description List stock movements with filtering. Default 30-day window, max 90 days.
-// @Tags movements
+// @Tags Movements
 // @Produce json
 // @Param inventory_item_id query string false "Filter by inventory item ID"
 // @Param warehouse_id query string false "Filter by warehouse ID"
@@ -85,7 +85,7 @@ func (h *MovementHandler) ListMovements(w http.ResponseWriter, r *http.Request) 
 // GetMovement godoc
 // @Summary Get stock movement
 // @Description Get a single stock movement by ID
-// @Tags movements
+// @Tags Movements
 // @Produce json
 // @Param id path string true "Movement ID"
 // @Success 200 {object} domain.StockMovement
@@ -105,7 +105,7 @@ func (h *MovementHandler) GetMovement(w http.ResponseWriter, r *http.Request) {
 // Receive godoc
 // @Summary Receive stock
 // @Description Receive stock into a warehouse (Admin only)
-// @Tags movements
+// @Tags Movements
 // @Accept json
 // @Produce json
 // @Param body body domain.ReceiveInput true "Receive data"
@@ -134,7 +134,7 @@ func (h *MovementHandler) Receive(w http.ResponseWriter, r *http.Request) {
 // Ship godoc
 // @Summary Ship stock
 // @Description Ship stock from a warehouse (Admin only)
-// @Tags movements
+// @Tags Movements
 // @Accept json
 // @Produce json
 // @Param body body domain.ShipInput true "Ship data"
@@ -164,7 +164,7 @@ func (h *MovementHandler) Ship(w http.ResponseWriter, r *http.Request) {
 // Adjust godoc
 // @Summary Adjust stock
 // @Description Adjust stock with a reason (Admin only). Positive = add, negative = subtract.
-// @Tags movements
+// @Tags Movements
 // @Accept json
 // @Produce json
 // @Param body body domain.AdjustInput true "Adjustment data"
@@ -194,7 +194,7 @@ func (h *MovementHandler) Adjust(w http.ResponseWriter, r *http.Request) {
 // Transfer godoc
 // @Summary Transfer stock between warehouses
 // @Description Transfer stock from one warehouse to another atomically (Admin only)
-// @Tags movements
+// @Tags Movements
 // @Accept json
 // @Produce json
 // @Param body body domain.TransferInput true "Transfer data"
@@ -224,7 +224,7 @@ func (h *MovementHandler) Transfer(w http.ResponseWriter, r *http.Request) {
 // Return godoc
 // @Summary Return stock
 // @Description Process a customer return (Admin only)
-// @Tags movements
+// @Tags Movements
 // @Accept json
 // @Produce json
 // @Param body body domain.ReturnInput true "Return data"

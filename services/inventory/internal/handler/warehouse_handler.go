@@ -20,7 +20,7 @@ func NewWarehouseHandler(svc *service.InventoryService) *WarehouseHandler {
 // ListWarehouses godoc
 // @Summary List warehouses
 // @Description Get all warehouses
-// @Tags warehouses
+// @Tags Warehouses
 // @Produce json
 // @Success 200 {array} domain.Warehouse
 // @Failure 500 {object} middleware.ErrorResponse
@@ -40,7 +40,7 @@ func (h *WarehouseHandler) ListWarehouses(w http.ResponseWriter, r *http.Request
 // GetWarehouse godoc
 // @Summary Get warehouse
 // @Description Get a single warehouse by ID
-// @Tags warehouses
+// @Tags Warehouses
 // @Produce json
 // @Param id path string true "Warehouse ID"
 // @Success 200 {object} domain.Warehouse
@@ -59,7 +59,7 @@ func (h *WarehouseHandler) GetWarehouse(w http.ResponseWriter, r *http.Request) 
 // CreateWarehouse godoc
 // @Summary Create warehouse
 // @Description Create a new warehouse (Admin only)
-// @Tags warehouses
+// @Tags Warehouses
 // @Accept json
 // @Produce json
 // @Param body body domain.CreateWarehouseInput true "Warehouse data"
@@ -96,7 +96,7 @@ func (h *WarehouseHandler) CreateWarehouse(w http.ResponseWriter, r *http.Reques
 // UpdateWarehouse godoc
 // @Summary Update warehouse
 // @Description Update an existing warehouse (Admin only)
-// @Tags warehouses
+// @Tags Warehouses
 // @Accept json
 // @Produce json
 // @Param id path string true "Warehouse ID"
@@ -126,7 +126,7 @@ func (h *WarehouseHandler) UpdateWarehouse(w http.ResponseWriter, r *http.Reques
 // DeactivateWarehouse godoc
 // @Summary Deactivate warehouse
 // @Description Soft-deactivate a warehouse (Admin only). Rejects if has stock or is default.
-// @Tags warehouses
+// @Tags Warehouses
 // @Param id path string true "Warehouse ID"
 // @Success 204
 // @Failure 404 {object} middleware.ErrorResponse

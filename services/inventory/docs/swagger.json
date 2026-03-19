@@ -19,7 +19,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "availability"
+                    "Availability"
                 ],
                 "summary": "Bulk check SKU availability",
                 "parameters": [
@@ -65,7 +65,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "availability"
+                    "Availability"
                 ],
                 "summary": "Check SKU availability",
                 "parameters": [
@@ -103,7 +103,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "inventory"
+                    "Inventory"
                 ],
                 "summary": "List inventory items",
                 "parameters": [
@@ -163,7 +163,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "inventory"
+                    "Inventory"
                 ],
                 "summary": "Get inventory item by SKU",
                 "parameters": [
@@ -204,7 +204,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "inventory"
+                    "Inventory"
                 ],
                 "summary": "Get inventory item",
                 "parameters": [
@@ -251,7 +251,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "inventory"
+                    "Inventory"
                 ],
                 "summary": "Update inventory item settings",
                 "parameters": [
@@ -300,50 +300,6 @@
                 }
             }
         },
-        "/inventory/items/{id}/stock": {
-            "get": {
-                "description": "Get stock levels per warehouse for a specific inventory item",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventory"
-                ],
-                "summary": "Get stock levels for an item",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Inventory item ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.StockLevel"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/middleware.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/middleware.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/inventory/movements": {
             "get": {
                 "description": "List stock movements with filtering. Default 30-day window, max 90 days.",
@@ -351,7 +307,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "List stock movements",
                 "parameters": [
@@ -431,7 +387,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Adjust stock",
                 "parameters": [
@@ -494,7 +450,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Receive stock",
                 "parameters": [
@@ -551,7 +507,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Return stock",
                 "parameters": [
@@ -608,7 +564,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Ship stock",
                 "parameters": [
@@ -671,7 +627,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Transfer stock between warehouses",
                 "parameters": [
@@ -729,7 +685,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "movements"
+                    "Movements"
                 ],
                 "summary": "Get stock movement",
                 "parameters": [
@@ -778,7 +734,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "reservations"
+                    "Reservations"
                 ],
                 "summary": "Reserve stock",
                 "parameters": [
@@ -835,7 +791,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "reservations"
+                    "Reservations"
                 ],
                 "summary": "Confirm reservation",
                 "parameters": [
@@ -889,7 +845,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "reservations"
+                    "Reservations"
                 ],
                 "summary": "Release reservation",
                 "parameters": [
@@ -940,7 +896,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "reservations"
+                    "Reservations"
                 ],
                 "summary": "Get reservations by order",
                 "parameters": [
@@ -971,6 +927,50 @@
                 }
             }
         },
+        "/inventory/stock/{id}": {
+            "get": {
+                "description": "Get stock levels per warehouse for a specific inventory item",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Get stock levels for an item",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Inventory item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.StockLevel"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/middleware.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middleware.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/inventory/warehouses": {
             "get": {
                 "description": "Get all warehouses",
@@ -978,7 +978,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "List warehouses",
                 "responses": {
@@ -1013,7 +1013,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "Create warehouse",
                 "parameters": [
@@ -1062,7 +1062,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "Get warehouse",
                 "parameters": [
@@ -1103,7 +1103,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "Update warehouse",
                 "parameters": [
@@ -1159,7 +1159,7 @@
                 ],
                 "description": "Soft-deactivate a warehouse (Admin only). Rejects if has stock or is default.",
                 "tags": [
-                    "warehouses"
+                    "Warehouses"
                 ],
                 "summary": "Deactivate warehouse",
                 "parameters": [

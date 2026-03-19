@@ -38,7 +38,9 @@ Real-time inventory management service for the RTS platform. Tracks stock quanti
 ```
 services/inventory/
 ├── cmd/server/
-│   └── main.go                    # Entry point: server, migrations, sweeper
+    │   ├── main.go                    # Entry point and migration bootstrap
+    │   ├── application_bootstrap.go   # Repository/service/handler/router wiring
+    │   └── server_runtime.go          # Runtime setup, background workers, shutdown
 ├── internal/
 │   ├── config/config.go           # Environment-based configuration
 │   ├── domain/                    # Plain structs, constants, error types
@@ -89,6 +91,24 @@ services/inventory/
 ├── Makefile
 └── go.mod / go.sum
 ```
+
+## Development Commands
+
+```bash
+# Run the API server
+make run
+
+# Run tests
+make test
+
+# Run migrations only
+make migrate
+
+# Regenerate Swagger docs without installing swag globally
+make swagger
+```
+
+`make swagger` uses `go run github.com/swaggo/swag/cmd/swag@v1.16.4`, so it works even if the `swag` binary is not installed on your machine.
 
 ## Database Schema
 
@@ -440,7 +460,7 @@ Swagger annotations live in the handler files (`internal/handler/*.go`) and the 
 
 ```go
 // @Summary Reserve stock
-// @Tags reservations
+// @Tags Reservations
 // @Accept json
 // @Param body body domain.ReserveInput true "Reservation input"
 // @Success 201 {object} domain.Reservation
@@ -524,6 +544,7 @@ The service spawns several goroutines beyond the main HTTP server. All are conte
 **Why a goroutine:** Reservation expiry is a background concern — no HTTP request triggers it. Without the sweeper, abandoned carts would hold stock indefinitely, effectively reducing available inventory. The sweeper ensures expired holds are reclaimed automatically without requiring the order service to explicitly cancel them.
 
 **Lifecycle:**
+
 ```
 main() → context.WithCancel(ctx) → startReservationSweeper(sweeperCtx, ...)
                                           │
@@ -538,16 +559,17 @@ main() → context.WithCancel(ctx) → startReservationSweeper(sweeperCtx, ...)
 
 **What it does:** Listens on the `inventory.catalog-events` RabbitMQ queue for messages from the catalog service. Runs an infinite `select` loop that reads from the AMQP delivery channel and dispatches to `handleMessage()` based on event type:
 
-| Event | Handler Action |
-| ----- | -------------- |
-| `catalog.product.created` | Creates inventory items (one per variant or one for the product) + stock levels at default warehouse |
-| `catalog.product.updated` | Syncs denormalized title/SKU, creates new variant items, archives removed variants |
-| `catalog.product.status_changed` | Updates item status; if archived, releases all active reservations |
-| `catalog.product.deleted` | Archives all inventory items for the product |
+| Event                            | Handler Action                                                                                       |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `catalog.product.created`        | Creates inventory items (one per variant or one for the product) + stock levels at default warehouse |
+| `catalog.product.updated`        | Syncs denormalized title/SKU, creates new variant items, archives removed variants                   |
+| `catalog.product.status_changed` | Updates item status; if archived, releases all active reservations                                   |
+| `catalog.product.deleted`        | Archives all inventory items for the product                                                         |
 
 **Why a goroutine:** AMQP message consumption is a blocking loop — it must run concurrently with the HTTP server. The consumer goroutine decouples the inventory service from synchronous catalog API calls. When a product is created in the catalog, the inventory service automatically provisions stock tracking for it via this event-driven flow rather than requiring a separate API call.
 
 **Lifecycle:**
+
 ```
 main() → context.WithCancel(ctx) → startCatalogConsumer(consumerCtx, ...)
                                           │
@@ -572,6 +594,7 @@ main() → context.WithCancel(ctx) → startCatalogConsumer(consumerCtx, ...)
 **Why a goroutine:** The main goroutine is blocked on `server.ListenAndServe()`. The shutdown handler must run concurrently to intercept OS signals and orchestrate a clean shutdown sequence — stopping background work first, then draining HTTP connections.
 
 **Lifecycle:**
+
 ```
 main() ──► go handleGracefulShutdown(server, consumerCancel, sweeperCancel)
                     │
@@ -601,12 +624,12 @@ main() ──► go handleGracefulShutdown(server, consumerCancel, sweeperCancel
 
 ### Summary
 
-| Goroutine | Spawned In | Trigger | Stopped By |
-| --------- | ---------- | ------- | ---------- |
-| Reservation sweeper | `startReservationSweeper()` | 30s ticker | `sweeperCancel()` |
-| Catalog consumer | `CatalogConsumer.Start()` | AMQP message delivery | `consumerCancel()` + `Close()` |
-| Shutdown handler | `main()` | OS signal (SIGINT/SIGTERM) | Returns after `server.Shutdown()` |
-| HTTP handlers | `net/http` (stdlib) | Incoming TCP connection | `server.Shutdown()` drains them |
+| Goroutine           | Spawned In                  | Trigger                    | Stopped By                        |
+| ------------------- | --------------------------- | -------------------------- | --------------------------------- |
+| Reservation sweeper | `startReservationSweeper()` | 30s ticker                 | `sweeperCancel()`                 |
+| Catalog consumer    | `CatalogConsumer.Start()`   | AMQP message delivery      | `consumerCancel()` + `Close()`    |
+| Shutdown handler    | `main()`                    | OS signal (SIGINT/SIGTERM) | Returns after `server.Shutdown()` |
+| HTTP handlers       | `net/http` (stdlib)         | Incoming TCP connection    | `server.Shutdown()` drains them   |
 
 ## Phase 2 — Planned Features
 

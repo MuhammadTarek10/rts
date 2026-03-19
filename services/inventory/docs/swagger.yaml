@@ -346,7 +346,7 @@ paths:
             $ref: '#/definitions/middleware.ErrorResponse'
       summary: Check SKU availability
       tags:
-      - availability
+      - Availability
   /inventory/availability/bulk:
     post:
       consumes:
@@ -378,7 +378,7 @@ paths:
             $ref: '#/definitions/middleware.ErrorResponse'
       summary: Bulk check SKU availability
       tags:
-      - availability
+      - Availability
   /inventory/items:
     get:
       consumes:
@@ -420,7 +420,7 @@ paths:
             $ref: '#/definitions/middleware.ErrorResponse'
       summary: List inventory items
       tags:
-      - inventory
+      - Inventory
   /inventory/items/{id}:
     get:
       description: Get a single inventory item with aggregated stock levels
@@ -447,7 +447,7 @@ paths:
             $ref: '#/definitions/middleware.ErrorResponse'
       summary: Get inventory item
       tags:
-      - inventory
+      - Inventory
     put:
       consumes:
       - application/json
@@ -487,36 +487,7 @@ paths:
       - BearerAuth: []
       summary: Update inventory item settings
       tags:
-      - inventory
-  /inventory/items/{id}/stock:
-    get:
-      description: Get stock levels per warehouse for a specific inventory item
-      parameters:
-      - description: Inventory item ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/domain.StockLevel'
-            type: array
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/middleware.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/middleware.ErrorResponse'
-      summary: Get stock levels for an item
-      tags:
-      - inventory
+      - Inventory
   /inventory/items/sku/{sku}:
     get:
       description: Lookup an inventory item by its SKU
@@ -543,7 +514,7 @@ paths:
             $ref: '#/definitions/middleware.ErrorResponse'
       summary: Get inventory item by SKU
       tags:
-      - inventory
+      - Inventory
   /inventory/movements:
     get:
       description: List stock movements with filtering. Default 30-day window, max
@@ -592,7 +563,7 @@ paths:
             $ref: '#/definitions/middleware.ErrorResponse'
       summary: List stock movements
       tags:
-      - movements
+      - Movements
   /inventory/movements/{id}:
     get:
       description: Get a single stock movement by ID
@@ -619,7 +590,7 @@ paths:
             $ref: '#/definitions/middleware.ErrorResponse'
       summary: Get stock movement
       tags:
-      - movements
+      - Movements
   /inventory/movements/adjust:
     post:
       consumes:
@@ -660,7 +631,7 @@ paths:
       - BearerAuth: []
       summary: Adjust stock
       tags:
-      - movements
+      - Movements
   /inventory/movements/receive:
     post:
       consumes:
@@ -696,7 +667,7 @@ paths:
       - BearerAuth: []
       summary: Receive stock
       tags:
-      - movements
+      - Movements
   /inventory/movements/return:
     post:
       consumes:
@@ -732,7 +703,7 @@ paths:
       - BearerAuth: []
       summary: Return stock
       tags:
-      - movements
+      - Movements
   /inventory/movements/ship:
     post:
       consumes:
@@ -772,7 +743,7 @@ paths:
       - BearerAuth: []
       summary: Ship stock
       tags:
-      - movements
+      - Movements
   /inventory/movements/transfer:
     post:
       consumes:
@@ -815,7 +786,7 @@ paths:
       - BearerAuth: []
       summary: Transfer stock between warehouses
       tags:
-      - movements
+      - Movements
   /inventory/reservations:
     post:
       consumes:
@@ -852,7 +823,7 @@ paths:
       - BearerAuth: []
       summary: Reserve stock
       tags:
-      - reservations
+      - Reservations
   /inventory/reservations/{order_id}:
     get:
       description: Get all reservations for a specific order
@@ -879,7 +850,7 @@ paths:
       - BearerAuth: []
       summary: Get reservations by order
       tags:
-      - reservations
+      - Reservations
   /inventory/reservations/confirm:
     post:
       consumes:
@@ -913,7 +884,7 @@ paths:
       - BearerAuth: []
       summary: Confirm reservation
       tags:
-      - reservations
+      - Reservations
   /inventory/reservations/release:
     post:
       consumes:
@@ -947,7 +918,36 @@ paths:
       - BearerAuth: []
       summary: Release reservation
       tags:
-      - reservations
+      - Reservations
+  /inventory/stock/{id}:
+    get:
+      description: Get stock levels per warehouse for a specific inventory item
+      parameters:
+      - description: Inventory item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.StockLevel'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: Get stock levels for an item
+      tags:
+      - Inventory
   /inventory/warehouses:
     get:
       description: Get all warehouses
@@ -966,7 +966,7 @@ paths:
             $ref: '#/definitions/middleware.ErrorResponse'
       summary: List warehouses
       tags:
-      - warehouses
+      - Warehouses
     post:
       consumes:
       - application/json
@@ -1001,7 +1001,7 @@ paths:
       - BearerAuth: []
       summary: Create warehouse
       tags:
-      - warehouses
+      - Warehouses
   /inventory/warehouses/{id}:
     delete:
       description: Soft-deactivate a warehouse (Admin only). Rejects if has stock
@@ -1031,7 +1031,7 @@ paths:
       - BearerAuth: []
       summary: Deactivate warehouse
       tags:
-      - warehouses
+      - Warehouses
     get:
       description: Get a single warehouse by ID
       parameters:
@@ -1053,7 +1053,7 @@ paths:
             $ref: '#/definitions/middleware.ErrorResponse'
       summary: Get warehouse
       tags:
-      - warehouses
+      - Warehouses
     put:
       consumes:
       - application/json
@@ -1093,7 +1093,7 @@ paths:
       - BearerAuth: []
       summary: Update warehouse
       tags:
-      - warehouses
+      - Warehouses
 securityDefinitions:
   BearerAuth:
     in: header

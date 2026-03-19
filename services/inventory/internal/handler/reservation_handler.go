@@ -20,7 +20,7 @@ func NewReservationHandler(svc *service.ReservationService) *ReservationHandler 
 // Reserve godoc
 // @Summary Reserve stock
 // @Description Reserve stock for an order. Auto-selects warehouse with sufficient stock.
-// @Tags reservations
+// @Tags Reservations
 // @Accept json
 // @Produce json
 // @Param body body domain.ReserveInput true "Reserve data"
@@ -49,7 +49,7 @@ func (h *ReservationHandler) Reserve(w http.ResponseWriter, r *http.Request) {
 // Confirm godoc
 // @Summary Confirm reservation
 // @Description Confirm a reservation after payment. Idempotent.
-// @Tags reservations
+// @Tags Reservations
 // @Accept json
 // @Produce json
 // @Param body body domain.ConfirmReservationInput true "Confirm data"
@@ -75,7 +75,7 @@ func (h *ReservationHandler) Confirm(w http.ResponseWriter, r *http.Request) {
 // Release godoc
 // @Summary Release reservation
 // @Description Release a reservation (order cancelled). Idempotent.
-// @Tags reservations
+// @Tags Reservations
 // @Accept json
 // @Produce json
 // @Param body body domain.ReleaseReservationInput true "Release data"
@@ -101,7 +101,7 @@ func (h *ReservationHandler) Release(w http.ResponseWriter, r *http.Request) {
 // GetByOrderID godoc
 // @Summary Get reservations by order
 // @Description Get all reservations for a specific order
-// @Tags reservations
+// @Tags Reservations
 // @Produce json
 // @Param order_id path string true "Order ID"
 // @Success 200 {array} domain.Reservation

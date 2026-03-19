@@ -20,7 +20,7 @@ func NewAvailabilityHandler(svc *service.AvailabilityService) *AvailabilityHandl
 // GetAvailability godoc
 // @Summary Check SKU availability
 // @Description Check if a SKU is available and how many units are in stock
-// @Tags availability
+// @Tags Availability
 // @Produce json
 // @Param sku path string true "SKU"
 // @Success 200 {object} service.AvailabilityResponse
@@ -39,7 +39,7 @@ func (h *AvailabilityHandler) GetAvailability(w http.ResponseWriter, r *http.Req
 // BulkAvailability godoc
 // @Summary Bulk check SKU availability
 // @Description Check availability for multiple SKUs at once (cart validation)
-// @Tags availability
+// @Tags Availability
 // @Accept json
 // @Produce json
 // @Param body body BulkAvailabilityRequest true "List of SKUs"
