@@ -504,6 +504,110 @@ The service uses several strategies to ensure correctness under concurrent acces
 - **Database CHECK constraints:** `quantity_on_hand >= 0`, `quantity_reserved >= 0`, and `quantity_reserved <= quantity_on_hand` are enforced at the database level as a safety net
 - **Immutable ledger:** Stock movements are append-only — no UPDATE or DELETE on `stock_movements`
 
+## Goroutines
+
+The service spawns several goroutines beyond the main HTTP server. All are context-aware and shut down cleanly via `context.WithCancel` during graceful shutdown.
+
+### 1. Reservation Expiry Sweeper
+
+**Where:** `cmd/server/server_runtime.go` → `startReservationSweeper()`
+
+**What it does:** Runs a background ticker that fires every **30 seconds**. On each tick, it calls `ReservationService.ExpireBatch(ctx, 100)` which:
+
+1. Queries up to 100 reservations where `status = 'active'` and `expires_at < NOW()`
+2. For each expired reservation, within a transaction:
+   - Marks the reservation as `expired` (with `RowsAffected` check to prevent double-processing)
+   - Restores the reserved quantity back to available stock (`quantity_reserved -= quantity`)
+   - Records a `release` stock movement in the audit ledger
+   - Publishes `inventory.reservation.released` and `inventory.stock.updated` events
+
+**Why a goroutine:** Reservation expiry is a background concern — no HTTP request triggers it. Without the sweeper, abandoned carts would hold stock indefinitely, effectively reducing available inventory. The sweeper ensures expired holds are reclaimed automatically without requiring the order service to explicitly cancel them.
+
+**Lifecycle:**
+```
+main() → context.WithCancel(ctx) → startReservationSweeper(sweeperCtx, ...)
+                                          │
+                                          └─ go func() { ticker loop }
+                                                    │
+                              shutdown signal ──► sweeperCancel() ──► ctx.Done() ──► goroutine returns
+```
+
+### 2. Catalog Event Consumer
+
+**Where:** `internal/consumer/catalog_consumer.go` → `CatalogConsumer.Start()`
+
+**What it does:** Listens on the `inventory.catalog-events` RabbitMQ queue for messages from the catalog service. Runs an infinite `select` loop that reads from the AMQP delivery channel and dispatches to `handleMessage()` based on event type:
+
+| Event | Handler Action |
+| ----- | -------------- |
+| `catalog.product.created` | Creates inventory items (one per variant or one for the product) + stock levels at default warehouse |
+| `catalog.product.updated` | Syncs denormalized title/SKU, creates new variant items, archives removed variants |
+| `catalog.product.status_changed` | Updates item status; if archived, releases all active reservations |
+| `catalog.product.deleted` | Archives all inventory items for the product |
+
+**Why a goroutine:** AMQP message consumption is a blocking loop — it must run concurrently with the HTTP server. The consumer goroutine decouples the inventory service from synchronous catalog API calls. When a product is created in the catalog, the inventory service automatically provisions stock tracking for it via this event-driven flow rather than requiring a separate API call.
+
+**Lifecycle:**
+```
+main() → context.WithCancel(ctx) → startCatalogConsumer(consumerCtx, ...)
+                                          │
+                                          └─ CatalogConsumer.Start()
+                                                  │
+                                                  └─ go func() { select { case msg, case <-ctx.Done() } }
+                                                              │
+                                shutdown signal ──► consumerCancel() ──► ctx.Done() ──► goroutine returns
+                                                                           + catalogConsumer.Close() closes AMQP channel/conn
+```
+
+### 3. Graceful Shutdown Handler
+
+**Where:** `cmd/server/main.go` (line 80) → `cmd/server/server_runtime.go` → `handleGracefulShutdown()`
+
+**What it does:** Blocks on an OS signal channel (`SIGINT` / `SIGTERM`). When a signal arrives, it:
+
+1. Cancels the consumer context (stops consuming new RabbitMQ messages)
+2. Cancels the sweeper context (stops the ticker loop)
+3. Calls `server.Shutdown()` with a **30-second timeout** (lets in-flight HTTP requests finish)
+
+**Why a goroutine:** The main goroutine is blocked on `server.ListenAndServe()`. The shutdown handler must run concurrently to intercept OS signals and orchestrate a clean shutdown sequence — stopping background work first, then draining HTTP connections.
+
+**Lifecycle:**
+```
+main() ──► go handleGracefulShutdown(server, consumerCancel, sweeperCancel)
+                    │
+                    └─ sigCh := make(chan os.Signal, 1)
+                       signal.Notify(sigCh, SIGINT, SIGTERM)
+                       <-sigCh                          ◄── blocks until signal
+                       consumerCancel()                 ◄── stop consumer goroutine
+                       sweeperCancel()                  ◄── stop sweeper goroutine
+                       server.Shutdown(30s timeout)     ◄── drain HTTP connections
+```
+
+### 4. HTTP Server (implicit)
+
+**Where:** Go's `net/http` server (stdlib)
+
+**What it does:** `http.Server.ListenAndServe()` spawns a new goroutine for every incoming HTTP connection. Each request is handled in its own goroutine by the stdlib — this is not code we manage explicitly, but it's important to understand for concurrency reasoning.
+
+**Why it matters:** Multiple requests can modify the same stock level concurrently. This is why the service uses optimistic locking (`version` column) and `SELECT ... FOR UPDATE` for reservations — without these, concurrent goroutines handling different HTTP requests would race on shared database rows.
+
+### sync.Mutex in Event Publisher
+
+**Where:** `internal/publisher/event_publisher.go`
+
+**What it does:** The `EventPublisher` struct holds a `sync.Mutex` that guards access to the AMQP channel. Both `Connect()`, `Close()`, and `publish()` acquire the lock before touching `p.ch` or `p.conn`.
+
+**Why:** The AMQP channel is **not goroutine-safe**. Since multiple HTTP handler goroutines can publish events concurrently (e.g., two stock movements happening at the same time), the mutex serializes access to the single AMQP channel to prevent data races and protocol errors.
+
+### Summary
+
+| Goroutine | Spawned In | Trigger | Stopped By |
+| --------- | ---------- | ------- | ---------- |
+| Reservation sweeper | `startReservationSweeper()` | 30s ticker | `sweeperCancel()` |
+| Catalog consumer | `CatalogConsumer.Start()` | AMQP message delivery | `consumerCancel()` + `Close()` |
+| Shutdown handler | `main()` | OS signal (SIGINT/SIGTERM) | Returns after `server.Shutdown()` |
+| HTTP handlers | `net/http` (stdlib) | Incoming TCP connection | `server.Shutdown()` drains them |
+
 ## Phase 2 — Planned Features
 
 ### Low Stock Alerts & Thresholds
