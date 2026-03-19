@@ -18,7 +18,7 @@ import (
 	"github.com/rts/inventory/internal/service"
 )
 
-type appRepositories struct {
+type Repositories struct {
 	inventory   *repository.InventoryRepository
 	warehouse   *repository.WarehouseRepository
 	stock       *repository.StockRepository
@@ -26,14 +26,14 @@ type appRepositories struct {
 	reservation *repository.ReservationRepository
 }
 
-type appServices struct {
+type Services struct {
 	inventory    *service.InventoryService
 	movement     *service.MovementService
 	reservation  *service.ReservationService
 	availability *service.AvailabilityService
 }
 
-type appHandlers struct {
+type Handlers struct {
 	inventory    *handler.InventoryHandler
 	warehouse    *handler.WarehouseHandler
 	movement     *handler.MovementHandler
@@ -41,7 +41,7 @@ type appHandlers struct {
 	availability *handler.AvailabilityHandler
 }
 
-type application struct {
+type Application struct {
 	handler            http.Handler
 	inventoryService   *service.InventoryService
 	reservationService *service.ReservationService
@@ -52,20 +52,20 @@ func initializeApplication(
 	pool *pgxpool.Pool,
 	redisCache *cache.RedisCache,
 	eventPublisher *publisher.EventPublisher,
-) *application {
+) *Application {
 	repositories := initializeRepositories(pool)
 	services := initializeServices(repositories, redisCache, eventPublisher)
 	handlers := initializeHandlers(services)
 
-	return &application{
+	return &Application{
 		handler:            initializeHTTPHandler(cfg, handlers),
 		inventoryService:   services.inventory,
 		reservationService: services.reservation,
 	}
 }
 
-func initializeRepositories(pool *pgxpool.Pool) *appRepositories {
-	return &appRepositories{
+func initializeRepositories(pool *pgxpool.Pool) *Repositories {
+	return &Repositories{
 		inventory:   repository.NewInventoryRepository(pool),
 		warehouse:   repository.NewWarehouseRepository(pool),
 		stock:       repository.NewStockRepository(pool),
@@ -75,10 +75,10 @@ func initializeRepositories(pool *pgxpool.Pool) *appRepositories {
 }
 
 func initializeServices(
-	repositories *appRepositories,
+	repositories *Repositories,
 	redisCache *cache.RedisCache,
 	eventPublisher *publisher.EventPublisher,
-) *appServices {
+) *Services {
 	inventoryService := service.NewInventoryService(
 		repositories.inventory,
 		repositories.stock,
@@ -87,7 +87,7 @@ func initializeServices(
 		eventPublisher,
 	)
 
-	return &appServices{
+	return &Services{
 		inventory: inventoryService,
 		movement: service.NewMovementService(
 			repositories.movement,
@@ -111,8 +111,8 @@ func initializeServices(
 	}
 }
 
-func initializeHandlers(services *appServices) *appHandlers {
-	return &appHandlers{
+func initializeHandlers(services *Services) *Handlers {
+	return &Handlers{
 		inventory:    handler.NewInventoryHandler(services.inventory),
 		warehouse:    handler.NewWarehouseHandler(services.inventory),
 		movement:     handler.NewMovementHandler(services.movement),
@@ -121,7 +121,7 @@ func initializeHandlers(services *appServices) *appHandlers {
 	}
 }
 
-func initializeHTTPHandler(cfg *config.Config, handlers *appHandlers) http.Handler {
+func initializeHTTPHandler(cfg *config.Config, handlers *Handlers) http.Handler {
 	apiHandler := router.New(
 		cfg.JWTAccessSecret,
 		cfg.SwaggerUsername,
