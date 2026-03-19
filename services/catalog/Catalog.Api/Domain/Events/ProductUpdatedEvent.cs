@@ -2,7 +2,10 @@ namespace Catalog.Api.Domain.Events;
 
 public sealed record ProductUpdatedEvent(
     string ProductId,
-    IReadOnlyList<string> ChangedFields
+    string Sku,
+    string Title,
+    IReadOnlyList<string> ChangedFields,
+    IReadOnlyList<ProductVariantEventData> Variants
 ) : Shared.Abstraction.IDomainEvent
 {
     public DateTime OccurredOnUtc { get; } = DateTime.UtcNow;

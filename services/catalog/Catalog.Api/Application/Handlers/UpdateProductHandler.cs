@@ -56,7 +56,10 @@ public sealed class UpdateProductHandler(
         await cache.RemoveAsync($"catalog:product:slug:{product.Slug}", cancellationToken);
 
         if (changedFields.Count > 0)
-            await eventPublisher.PublishAsync(new ProductUpdatedEvent(product.Id, changedFields), cancellationToken);
+        {
+            var variantData = product.Variants.Select(v => new ProductVariantEventData(v.VariantId, v.Sku, v.Attributes)).ToList();
+            await eventPublisher.PublishAsync(new ProductUpdatedEvent(product.Id, product.Sku, product.Title, changedFields, variantData), cancellationToken);
+        }
 
         logger.LogInformation("Product {ProductId} updated in {ElapsedMs}ms", id, sw.ElapsedMilliseconds);
         return ProductResponseDto.FromEntity(product);

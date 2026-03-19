@@ -7,9 +7,16 @@ public sealed record ProductCreatedEvent(
     string? BrandId,
     IReadOnlyList<string> CategoryIds,
     decimal Price,
-    string Currency
+    string Currency,
+    IReadOnlyList<ProductVariantEventData> Variants
 ) : Shared.Abstraction.IDomainEvent
 {
     public DateTime OccurredOnUtc { get; } = DateTime.UtcNow;
     public string EventType { get; } = "catalog.product.created";
 }
+
+public sealed record ProductVariantEventData(
+    string VariantId,
+    string Sku,
+    Dictionary<string, string> Attributes
+);

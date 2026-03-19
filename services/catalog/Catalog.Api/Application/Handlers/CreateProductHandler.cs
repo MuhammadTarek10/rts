@@ -53,7 +53,8 @@ public sealed class CreateProductHandler(
 
         await uow.Products.SaveAsync(product, isNew: true, cancellationToken);
 
-        var domainEvent = new ProductCreatedEvent(product.Id, product.Sku, product.Title, product.BrandId, product.CategoryIds, product.Price.Amount, product.Price.Currency);
+        var variantData = product.Variants.Select(v => new ProductVariantEventData(v.VariantId, v.Sku, v.Attributes)).ToList();
+        var domainEvent = new ProductCreatedEvent(product.Id, product.Sku, product.Title, product.BrandId, product.CategoryIds, product.Price.Amount, product.Price.Currency, variantData);
         await eventPublisher.PublishAsync(domainEvent, cancellationToken);
 
         logger.LogInformation("Product {ProductId} created with SKU {Sku} in {ElapsedMs}ms", product.Id, product.Sku, sw.ElapsedMilliseconds);
