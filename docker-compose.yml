@@ -388,6 +388,50 @@ services:
     networks:
       - backend
 
+  inventory:
+    build:
+      context: ./services/inventory
+      dockerfile: Dockerfile
+    container_name: inventory
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PORT: ${INVENTORY_PORT}
+      DATABASE_URL: ${INVENTORY_DATABASE_URL}
+      RABBITMQ_URI: ${INVENTORY_RABBITMQ_URI}
+      REDIS_URL: ${INVENTORY_REDIS_URL}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      RABBITMQ_EXCHANGE_NAME: ${INVENTORY_RABBITMQ_EXCHANGE_NAME}
+      RABBITMQ_QUEUE_NAME: ${INVENTORY_RABBITMQ_QUEUE_NAME}
+      CATALOG_QUEUE_NAME: ${INVENTORY_CATALOG_QUEUE_NAME}
+      SWAGGER_USERNAME: ${INVENTORY_SWAGGER_USERNAME}
+      SWAGGER_PASSWORD: ${INVENTORY_SWAGGER_PASSWORD}
+    ports:
+      - "3004:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - backend
+
   frontend:
     build:
       context: ./app

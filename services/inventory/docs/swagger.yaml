@@ -1,0 +1,1102 @@
+basePath: /api
+definitions:
+  domain.AdjustInput:
+    properties:
+      inventory_item_id:
+        type: string
+      quantity:
+        type: integer
+      reason:
+        type: string
+      warehouse_id:
+        type: string
+    type: object
+  domain.ConfirmReservationInput:
+    properties:
+      order_id:
+        type: string
+    type: object
+  domain.CreateWarehouseInput:
+    properties:
+      address_line1:
+        type: string
+      city:
+        type: string
+      code:
+        type: string
+      country:
+        type: string
+      is_default:
+        type: boolean
+      name:
+        type: string
+    type: object
+  domain.InventoryItem:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      is_tracked:
+        type: boolean
+      product_id:
+        type: string
+      sku:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      variant_id:
+        type: string
+    type: object
+  domain.InventoryItemWithStock:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      is_tracked:
+        type: boolean
+      product_id:
+        type: string
+      sku:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      total_available:
+        type: integer
+      total_on_hand:
+        type: integer
+      total_reserved:
+        type: integer
+      updated_at:
+        type: string
+      variant_id:
+        type: string
+    type: object
+  domain.ReceiveInput:
+    properties:
+      cost_per_unit:
+        type: number
+      currency:
+        type: string
+      inventory_item_id:
+        type: string
+      quantity:
+        type: integer
+      reason:
+        type: string
+      reference_id:
+        type: string
+      reference_type:
+        type: string
+      warehouse_id:
+        type: string
+    type: object
+  domain.ReleaseReservationInput:
+    properties:
+      order_id:
+        type: string
+    type: object
+  domain.Reservation:
+    properties:
+      confirmed_at:
+        type: string
+      created_at:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: string
+      inventory_item_id:
+        type: string
+      order_id:
+        type: string
+      quantity:
+        type: integer
+      released_at:
+        type: string
+      status:
+        type: string
+      warehouse_id:
+        type: string
+    type: object
+  domain.ReserveInput:
+    properties:
+      order_id:
+        type: string
+      quantity:
+        type: integer
+      sku:
+        type: string
+      ttl_minutes:
+        type: integer
+    type: object
+  domain.ReturnInput:
+    properties:
+      inventory_item_id:
+        type: string
+      quantity:
+        type: integer
+      reason:
+        type: string
+      reference_id:
+        type: string
+      reference_type:
+        type: string
+      warehouse_id:
+        type: string
+    type: object
+  domain.ShipInput:
+    properties:
+      inventory_item_id:
+        type: string
+      quantity:
+        type: integer
+      reason:
+        type: string
+      reference_id:
+        type: string
+      reference_type:
+        type: string
+      warehouse_id:
+        type: string
+    type: object
+  domain.StockLevel:
+    properties:
+      id:
+        type: string
+      inventory_item_id:
+        type: string
+      quantity_available:
+        type: integer
+      quantity_on_hand:
+        type: integer
+      quantity_reserved:
+        type: integer
+      reorder_point:
+        type: integer
+      reorder_quantity:
+        type: integer
+      updated_at:
+        type: string
+      version:
+        type: integer
+      warehouse_id:
+        type: string
+    type: object
+  domain.StockMovement:
+    properties:
+      cost_per_unit:
+        type: number
+      created_at:
+        type: string
+      currency:
+        type: string
+      id:
+        type: string
+      inventory_item_id:
+        type: string
+      performed_by:
+        type: string
+      quantity:
+        type: integer
+      reason:
+        type: string
+      reference_id:
+        type: string
+      reference_type:
+        type: string
+      type:
+        type: string
+      warehouse_id:
+        type: string
+    type: object
+  domain.TransferInput:
+    properties:
+      from_warehouse_id:
+        type: string
+      inventory_item_id:
+        type: string
+      quantity:
+        type: integer
+      reason:
+        type: string
+      to_warehouse_id:
+        type: string
+    type: object
+  domain.UpdateInventoryItemInput:
+    properties:
+      is_tracked:
+        type: boolean
+      reorder_point:
+        type: integer
+      reorder_quantity:
+        type: integer
+    type: object
+  domain.UpdateWarehouseInput:
+    properties:
+      address_line1:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      is_default:
+        type: boolean
+      name:
+        type: string
+    type: object
+  domain.Warehouse:
+    properties:
+      address_line1:
+        type: string
+      city:
+        type: string
+      code:
+        type: string
+      country:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      is_default:
+        type: boolean
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  handler.BulkAvailabilityRequest:
+    properties:
+      skus:
+        items:
+          type: string
+        type: array
+    type: object
+  handler.PaginatedResponse:
+    properties:
+      data: {}
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  middleware.ErrorResponse:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  middleware.ErrorResponseWithDetail:
+    properties:
+      available:
+        type: integer
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  service.AvailabilityResponse:
+    properties:
+      available:
+        type: boolean
+      quantity:
+        type: integer
+      sku:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Real-time inventory management service for the RTS platform
+  title: Inventory Service API
+  version: "1.0"
+paths:
+  /inventory/availability/{sku}:
+    get:
+      description: Check if a SKU is available and how many units are in stock
+      parameters:
+      - description: SKU
+        in: path
+        name: sku
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.AvailabilityResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: Check SKU availability
+      tags:
+      - availability
+  /inventory/availability/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Check availability for multiple SKUs at once (cart validation)
+      parameters:
+      - description: List of SKUs
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.BulkAvailabilityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/service.AvailabilityResponse'
+            type: array
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: Bulk check SKU availability
+      tags:
+      - availability
+  /inventory/items:
+    get:
+      consumes:
+      - application/json
+      description: List all inventory items with optional filtering and pagination
+      parameters:
+      - description: Filter by status (active, archived, draft)
+        in: query
+        name: status
+        type: string
+      - description: Filter by SKU (partial match)
+        in: query
+        name: sku
+        type: string
+      - description: Filter by product ID
+        in: query
+        name: product_id
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.PaginatedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: List inventory items
+      tags:
+      - inventory
+  /inventory/items/{id}:
+    get:
+      description: Get a single inventory item with aggregated stock levels
+      parameters:
+      - description: Inventory item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.InventoryItemWithStock'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: Get inventory item
+      tags:
+      - inventory
+    put:
+      consumes:
+      - application/json
+      description: Update an inventory item's tracking and reorder settings
+      parameters:
+      - description: Inventory item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update fields
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateInventoryItemInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.InventoryItem'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update inventory item settings
+      tags:
+      - inventory
+  /inventory/items/{id}/stock:
+    get:
+      description: Get stock levels per warehouse for a specific inventory item
+      parameters:
+      - description: Inventory item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.StockLevel'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: Get stock levels for an item
+      tags:
+      - inventory
+  /inventory/items/sku/{sku}:
+    get:
+      description: Lookup an inventory item by its SKU
+      parameters:
+      - description: SKU
+        in: path
+        name: sku
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.InventoryItem'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: Get inventory item by SKU
+      tags:
+      - inventory
+  /inventory/movements:
+    get:
+      description: List stock movements with filtering. Default 30-day window, max
+        90 days.
+      parameters:
+      - description: Filter by inventory item ID
+        in: query
+        name: inventory_item_id
+        type: string
+      - description: Filter by warehouse ID
+        in: query
+        name: warehouse_id
+        type: string
+      - description: Filter by movement type
+        in: query
+        name: type
+        type: string
+      - description: Start date (RFC3339)
+        in: query
+        name: start_date
+        type: string
+      - description: End date (RFC3339)
+        in: query
+        name: end_date
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.PaginatedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: List stock movements
+      tags:
+      - movements
+  /inventory/movements/{id}:
+    get:
+      description: Get a single stock movement by ID
+      parameters:
+      - description: Movement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.StockMovement'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: Get stock movement
+      tags:
+      - movements
+  /inventory/movements/adjust:
+    post:
+      consumes:
+      - application/json
+      description: Adjust stock with a reason (Admin only). Positive = add, negative
+        = subtract.
+      parameters:
+      - description: Adjustment data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.AdjustInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.StockMovement'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponseWithDetail'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Adjust stock
+      tags:
+      - movements
+  /inventory/movements/receive:
+    post:
+      consumes:
+      - application/json
+      description: Receive stock into a warehouse (Admin only)
+      parameters:
+      - description: Receive data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReceiveInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.StockMovement'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Receive stock
+      tags:
+      - movements
+  /inventory/movements/return:
+    post:
+      consumes:
+      - application/json
+      description: Process a customer return (Admin only)
+      parameters:
+      - description: Return data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReturnInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.StockMovement'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Return stock
+      tags:
+      - movements
+  /inventory/movements/ship:
+    post:
+      consumes:
+      - application/json
+      description: Ship stock from a warehouse (Admin only)
+      parameters:
+      - description: Ship data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ShipInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.StockMovement'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponseWithDetail'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Ship stock
+      tags:
+      - movements
+  /inventory/movements/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfer stock from one warehouse to another atomically (Admin
+        only)
+      parameters:
+      - description: Transfer data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TransferInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/domain.StockMovement'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponseWithDetail'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Transfer stock between warehouses
+      tags:
+      - movements
+  /inventory/reservations:
+    post:
+      consumes:
+      - application/json
+      description: Reserve stock for an order. Auto-selects warehouse with sufficient
+        stock.
+      parameters:
+      - description: Reserve data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReserveInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Reservation'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponseWithDetail'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Reserve stock
+      tags:
+      - reservations
+  /inventory/reservations/{order_id}:
+    get:
+      description: Get all reservations for a specific order
+      parameters:
+      - description: Order ID
+        in: path
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Reservation'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get reservations by order
+      tags:
+      - reservations
+  /inventory/reservations/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Confirm a reservation after payment. Idempotent.
+      parameters:
+      - description: Confirm data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ConfirmReservationInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Confirm reservation
+      tags:
+      - reservations
+  /inventory/reservations/release:
+    post:
+      consumes:
+      - application/json
+      description: Release a reservation (order cancelled). Idempotent.
+      parameters:
+      - description: Release data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReleaseReservationInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Release reservation
+      tags:
+      - reservations
+  /inventory/warehouses:
+    get:
+      description: Get all warehouses
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Warehouse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: List warehouses
+      tags:
+      - warehouses
+    post:
+      consumes:
+      - application/json
+      description: Create a new warehouse (Admin only)
+      parameters:
+      - description: Warehouse data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateWarehouseInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Warehouse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create warehouse
+      tags:
+      - warehouses
+  /inventory/warehouses/{id}:
+    delete:
+      description: Soft-deactivate a warehouse (Admin only). Rejects if has stock
+        or is default.
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Deactivate warehouse
+      tags:
+      - warehouses
+    get:
+      description: Get a single warehouse by ID
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Warehouse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      summary: Get warehouse
+      tags:
+      - warehouses
+    put:
+      consumes:
+      - application/json
+      description: Update an existing warehouse (Admin only)
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update fields
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateWarehouseInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Warehouse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update warehouse
+      tags:
+      - warehouses
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
