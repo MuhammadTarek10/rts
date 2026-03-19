@@ -6,18 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 RTS is a microservices monorepo with a polyglot backend and a Vue 3 frontend:
 
-| Service | Language/Framework | Database | Port |
-|---|---|---|---|
-| `services/auth` | NestJS (TypeScript) | PostgreSQL (Drizzle ORM) | 3001 |
-| `services/catalog` | ASP.NET Core (.NET 10) | MongoDB | - |
-| `services/inventory` | (planned) | - | - |
-| `services/orders` | (planned) | - | - |
-| `services/payment` | (planned) | - | - |
-| `services/notification` | (planned) | - | - |
-| `services/recommendation` | (planned) | - | - |
-| `app` | Vue 3 + Vite + Pinia | - | - |
+| Service                   | Language/Framework     | Database                 | Host Port  |
+| ------------------------- | ---------------------- | ------------------------ | ---------- |
+| `services/auth`           | NestJS (TypeScript)    | PostgreSQL (Drizzle ORM) | 3001       |
+| `services/catalog`        | ASP.NET Core (.NET 10) | MongoDB                  | 3002       |
+| `services/inventory`      | (planned)              | -                        | -          |
+| `services/orders`         | (planned)              | -                        | -          |
+| `services/payment`        | (planned)              | -                        | -          |
+| `services/notification`   | (planned)              | -                        | -          |
+| `services/recommendation` | (planned)              | -                        | -          |
+| `app`                     | Vue 3 + Vite + Pinia   | -                        | 80 (nginx) |
 
-**Infrastructure (docker-compose.yml):** PostgreSQL, MongoDB, Redis, RabbitMQ, MinIO (S3-compatible), Nginx, Grafana, Certbot.
+**Infrastructure (docker-compose.yml):** PostgreSQL (5432), MongoDB (27017), Redis (6379), RabbitMQ (5672/15672), MinIO (9000/9001), Nginx (80/443), Grafana (3000), Redis Insight (5540), Certbot.
+
+**Environment:** All docker-compose environment values are sourced from the root `.env` file — no hardcoded values in `docker-compose.yml`.
 
 ## Auth Service (`services/auth`)
 
@@ -52,6 +54,10 @@ npm run dev:studio
 
 ASP.NET Core Web API (.NET 10) using Clean Architecture layers: `Domain/`, `Application/`, `Infrastructure/`, `Controllers/`. JWT bearer auth is validated using the shared secret from the auth service.
 
+**API conventions:** JSON responses use `snake_case` field naming (configured via `JsonNamingPolicy.SnakeCaseLower` in `Program.cs`). Internal serialization (RabbitMQ events, Redis cache) uses `camelCase` — do not change those.
+
+**Local dev uses port 27020 for MongoDB** (via `services/catalog/docker-compose.yml`), while the root docker-compose uses 27017.
+
 ```bash
 # Dev
 cd services/catalog
@@ -80,19 +86,26 @@ npm run build    # vue-tsc + vite build
 # Start all infrastructure + services
 docker compose up -d
 
-# Start individual service
+# Start individual infrastructure
 docker compose up -d db mongo redis rabbitmq
+
+# Build and start a specific service
+docker compose up -d --build catalog
 ```
+
+**Nginx gateway** routes `/api/auth/` → auth service. Catalog and other service routes are defined in `nginx/conf.d/default.conf`. MinIO console at `/minio/`, Grafana at `/grafana/`, RabbitMQ management at `/rabbitmq/`.
 
 ## Pre-commit Hooks
 
 Root-level Husky + lint-staged runs automatically on commit:
+
 - TypeScript files → ESLint (auth + app)
 - Vue files → ESLint
 - Go files → `gofumpt`
 - C# files → `dotnet format services/catalog/Catalog.slnx --include`
 
 Setup once per machine:
+
 ```bash
 npm install   # from repo root — installs Husky hooks
 ```
@@ -110,6 +123,7 @@ Conventional commits enforced via `commitlint` (e.g. `feat:`, `fix:`, `chore:`).
 Use the `/browse` skill from gstack for all web browsing. Never use `mcp__chrome-devtools__*` tools.
 
 **Available skills:**
+
 - `/plan-ceo-review` - CEO-level planning review
 - `/plan-eng-review` - Engineering review planning
 - `/review` - Code review
@@ -118,3 +132,7 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__chrome
 - `/qa` - QA testing
 - `/setup-browser-cookies` - Setup browser cookies
 - `/retro` - Retro/review functionality
+
+## Important Notes
+
+After major changes on either services or frontend app, update their respective `README.md` file.
