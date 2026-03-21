@@ -448,7 +448,7 @@ paths:
       summary: Get inventory item
       tags:
       - Inventory
-    put:
+    patch:
       consumes:
       - application/json
       description: Update an inventory item's tracking and reorder settings
@@ -1054,7 +1054,7 @@ paths:
       summary: Get warehouse
       tags:
       - Warehouses
-    put:
+    patch:
       consumes:
       - application/json
       description: Update an existing warehouse (Admin only)
