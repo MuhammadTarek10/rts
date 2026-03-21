@@ -21,9 +21,7 @@ export const user = pgTable('users', {
 });
 
 export const userRelations = relations(user, ({ many, one }) => ({
-  auths: many(auth, {
-    relationName: 'user',
-  }),
+  auths: many(auth),
   profile: one(userProfile, {
     fields: [user.id],
     references: [userProfile.user_id],

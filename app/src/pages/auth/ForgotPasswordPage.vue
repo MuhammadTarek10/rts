@@ -3,53 +3,23 @@
     <div class="page-title">
       <h2>Forgot Password</h2>
       <p class="instruction">
-        Enter your email address and we'll send you a link to reset your
-        password.
+        Password reset is not yet available. Please contact support if you need
+        to reset your password.
       </p>
     </div>
 
-    <form @submit.prevent="handleSubmit">
-      <vargo-form-field label="Email" htmlFor="email">
-        <vargo-text-input
-          id="email"
-          type="email"
-          v-model="email"
-          required
-          placeholder="Enter your email"
-        />
-      </vargo-form-field>
-
-      <div class="form-actions">
-        <vargo-button type="submit" variant="primary"
-          >Send Reset Link</vargo-button
-        >
-      </div>
-    </form>
-
-    <div class="auth-links text-center mt-md">
-      <router-link to="/auth/sign-in">Back to Sign In</router-link>
+    <div class="auth-links">
+      <router-link to="/auth/sign-in">
+        Back to Sign In
+      </router-link>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
-import VargoButton from '../../components/atoms/VargoButton.vue';
-import VargoFormField from '../../components/molecules/VargoFormField.vue';
-import VargoTextInput from '../../components/atoms/VargoTextInput.vue';
-
-const email = ref('');
-
-const handleSubmit = () => {
-  console.log('Reset password for:', email.value);
-  // Add password reset logic here
-};
-</script>
-
 <style scoped>
 .page-title {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .page-title h2 {
@@ -58,29 +28,24 @@ const handleSubmit = () => {
 }
 
 .instruction {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+  color: var(--text-tertiary);
+  font-size: 0.92rem;
   line-height: 1.5;
 }
 
-.form-actions {
-  display: flex;
-  margin-top: 1.5rem;
-}
-
-.form-actions :deep(.atom-button) {
-  width: 100%;
-}
-
 .auth-links {
-  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 0.5rem;
 }
 
 .auth-links a {
   color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 500;
   text-decoration: none;
 }
+
 .auth-links a:hover {
-  text-decoration: underline;
+  color: var(--primary-hover);
 }
 </style>

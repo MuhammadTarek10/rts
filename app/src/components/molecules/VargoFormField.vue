@@ -1,8 +1,15 @@
 <template>
   <div class="form-field">
-    <label v-if="label" :for="htmlFor" class="form-label">{{ label }}</label>
+    <label
+      v-if="label"
+      :for="htmlFor"
+      class="form-label"
+    >{{ label }}</label>
     <slot />
-    <span v-if="error" class="error-message">{{ error }}</span>
+    <span
+      v-if="error"
+      class="error-message"
+    >{{ error }}</span>
   </div>
 </template>
 
@@ -18,29 +25,29 @@ defineProps<{
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
   width: 100%;
 }
 
 .form-label {
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
-  margin-left: 2px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .error-message {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--danger-color);
-  margin-top: 0.25rem;
-  animation: fadeIn 0.3s ease;
+  animation: errorReveal 0.25s ease;
 }
 
-@keyframes fadeIn {
+@keyframes errorReveal {
   from {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;

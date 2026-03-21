@@ -1,81 +1,142 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="sign-up-form">
-    <vargo-form-field label="Full Name" htmlFor="name">
-      <vargo-text-input
-        id="name"
-        type="text"
-        placeholder="Billy Butcher"
-        v-model="name"
-        required
-      />
-    </vargo-form-field>
+  <form
+    class="sign-up-form"
+    @submit="onSubmit"
+  >
+    <div class="name-row">
+      <VargoFormField
+        label="First Name"
+        html-for="first_name"
+        :error="firstNameError"
+      >
+        <VargoTextInput
+          id="first_name"
+          v-model="firstNameValue"
+          type="text"
+          placeholder="Billy"
+          :invalid="!!firstNameError"
+        />
+      </VargoFormField>
 
-    <vargo-form-field label="Email" htmlFor="email">
-      <vargo-text-input
+      <VargoFormField
+        label="Last Name"
+        html-for="last_name"
+        :error="lastNameError"
+      >
+        <VargoTextInput
+          id="last_name"
+          v-model="lastNameValue"
+          type="text"
+          placeholder="Butcher"
+          :invalid="!!lastNameError"
+        />
+      </VargoFormField>
+    </div>
+
+    <VargoFormField
+      label="Email"
+      html-for="email"
+      :error="emailError"
+    >
+      <VargoTextInput
         id="email"
+        v-model="emailValue"
         type="email"
         placeholder="billy.butcher@vaught.com"
-        v-model="email"
-        required
+        :invalid="!!emailError"
       />
-    </vargo-form-field>
+    </VargoFormField>
 
-    <vargo-form-field label="Password" htmlFor="password">
-      <vargo-text-input
+    <VargoFormField
+      label="Password"
+      html-for="password"
+      :error="passwordError"
+    >
+      <VargoTextInput
         id="password"
+        v-model="passwordValue"
         type="password"
         placeholder="Create a password"
-        v-model="password"
-        required
+        :invalid="!!passwordError"
       />
-    </vargo-form-field>
+    </VargoFormField>
 
-    <vargo-form-field label="Confirm Password" htmlFor="confirm-password">
-      <vargo-text-input
-        id="confirm-password"
+    <VargoFormField
+      label="Confirm Password"
+      html-for="confirm_password"
+      :error="confirmPasswordError"
+    >
+      <VargoTextInput
+        id="confirm_password"
+        v-model="confirmPasswordValue"
         type="password"
         placeholder="Confirm your password"
-        v-model="confirmPassword"
-        required
+        :invalid="!!confirmPasswordError"
       />
-    </vargo-form-field>
+    </VargoFormField>
+
+    <div
+      v-if="error"
+      class="form-error"
+    >
+      {{ error }}
+    </div>
 
     <div class="form-actions">
-      <VargoButton type="submit" variant="primary">Sign Up</VargoButton>
+      <VargoButton
+        type="submit"
+        variant="primary"
+        :loading="loading"
+      >
+        Sign Up
+      </VargoButton>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import VargoButton from '../atoms/VargoButton.vue';
-import VargoFormField from '../molecules/VargoFormField.vue';
-import VargoTextInput from '../atoms/VargoTextInput.vue';
+import { useForm, useField } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import { signUpSchema } from '@/schemas/auth';
+import VargoButton from '@/components/atoms/VargoButton.vue';
+import VargoFormField from '@/components/molecules/VargoFormField.vue';
+import VargoTextInput from '@/components/atoms/VargoTextInput.vue';
 
-const emit =
-  defineEmits<
-    (
-      e: 'submit',
-      payload: { name: string; email: string; password: string }
-    ) => void
-  >();
+defineProps<{
+  loading?: boolean;
+  error?: string | null;
+}>();
 
-const name = ref('');
-const email = ref('');
-const password = ref('');
-const confirmPassword = ref('');
+const emit = defineEmits<{
+  (
+    e: 'submit',
+    payload: {
+      email: string;
+      password: string;
+      first_name: string;
+      last_name: string;
+    },
+  ): void;
+}>();
 
-const handleSubmit = () => {
-  if (password.value !== confirmPassword.value) {
-    alert("Passwords don't match"); // Or use a proper error handling
-    return;
-  }
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(signUpSchema),
+});
+
+const { value: firstNameValue, errorMessage: firstNameError } = useField<string>('first_name');
+const { value: lastNameValue, errorMessage: lastNameError } = useField<string>('last_name');
+const { value: emailValue, errorMessage: emailError } = useField<string>('email');
+const { value: passwordValue, errorMessage: passwordError } = useField<string>('password');
+const { value: confirmPasswordValue, errorMessage: confirmPasswordError } = useField<string>('confirm_password');
+
+const onSubmit = handleSubmit((values) => {
   emit('submit', {
-    name: name.value,
-    email: email.value,
-    password: password.value,
+    email: values.email,
+    password: values.password,
+    first_name: values.first_name,
+    last_name: values.last_name,
   });
-};
+});
 </script>
 
 <style scoped>
@@ -83,10 +144,26 @@ const handleSubmit = () => {
   width: 100%;
 }
 
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.form-error {
+  padding: 0.7rem 0.875rem;
+  border-radius: var(--radius-md);
+  background-color: rgba(217, 72, 72, 0.08);
+  border: 1px solid rgba(217, 72, 72, 0.2);
+  color: var(--danger-color);
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+
 .form-actions {
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   width: 100%;
 }
 

@@ -1,15 +1,15 @@
 <template>
   <div class="input-wrapper">
     <input
+      :id="id"
       v-model="value"
       :type="type"
       :placeholder="placeholder"
-      :id="id"
       :required="required"
       :disabled="disabled"
       class="vargo-input"
       :class="{ 'is-invalid': invalid }"
-    />
+    >
   </div>
 </template>
 
@@ -37,7 +37,7 @@ const emit = defineEmits<(e: 'update:modelValue', value: string) => void>();
 
 const value = computed({
   get() {
-    return props.modelValue;
+    return props.modelValue ?? '';
   },
   set(value) {
     emit('update:modelValue', value);
@@ -53,14 +53,17 @@ const value = computed({
 
 .vargo-input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 0.875rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-family: var(--font-sans);
-  transition: all var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
   box-sizing: border-box;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-color);
   color: var(--text-primary);
 }
 
@@ -71,8 +74,7 @@ const value = computed({
 .vargo-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  background-color: var(--bg-tertiary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 3px rgba(212, 160, 83, 0.1);
 }
 
 .vargo-input.is-invalid {
@@ -80,12 +82,12 @@ const value = computed({
 }
 
 .vargo-input.is-invalid:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 0 0 3px rgba(217, 72, 72, 0.1);
 }
 
 .vargo-input:disabled {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--bg-tertiary);
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.5;
 }
 </style>

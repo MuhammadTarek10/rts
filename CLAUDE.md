@@ -164,5 +164,6 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__chrome
 
 ## Important Notes
 
-- Update this file after any major changes
+- Update this file after any major changes.
 - After major changes on either services or frontend app, update their respective `README.md` file.
+- If any changes happened to frontend app, follow atomic design principles, clean code and best practices.

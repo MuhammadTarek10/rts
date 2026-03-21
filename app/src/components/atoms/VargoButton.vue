@@ -1,15 +1,21 @@
 <template>
   <button
     class="atom-button"
-    :class="[variant, { 'is-disabled': disabled }]"
-    :disabled="disabled"
+    :class="[variant, { 'is-disabled': isDisabled, 'is-loading': loading }]"
+    :disabled="isDisabled"
     @click="handleClick"
   >
+    <span
+      v-if="loading"
+      class="spinner"
+    />
     <slot>{{ text }}</slot>
   </button>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 const props = defineProps({
   text: {
     type: String,
@@ -25,12 +31,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['click']);
 
+const isDisabled = computed(() => props.disabled || props.loading);
+
 const handleClick = (event: MouseEvent) => {
-  if (!props.disabled) {
+  if (!isDisabled.value) {
     emit('click', event);
   }
 };
@@ -41,67 +53,99 @@ const handleClick = (event: MouseEvent) => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
+  gap: 0.5rem;
+  padding: 0.7rem 1.5rem;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  font-family: inherit;
+  font-family: var(--font-sans);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
   line-height: 1;
+  letter-spacing: 0.01em;
 }
 
 .atom-button:disabled,
 .atom-button.is-disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
-  filter: grayscale(100%);
 }
 
-/* Primary Variant */
+.atom-button.is-loading {
+  opacity: 0.7;
+}
+
+/* Spinner */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Primary — Amber */
 .atom-button.primary {
   background-color: var(--primary-color);
-  color: white;
-  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+  color: #0a0a0a;
+  font-weight: 700;
 }
 .atom-button.primary:hover:not(:disabled) {
   background-color: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 20px rgba(212, 160, 83, 0.25);
 }
 .atom-button.primary:active:not(:disabled) {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
-/* Secondary Variant */
+/* Secondary */
 .atom-button.secondary {
   background-color: transparent;
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-  background-color: var(--bg-secondary);
 }
 .atom-button.secondary:hover:not(:disabled) {
   border-color: var(--primary-color);
   color: var(--primary-color);
+  background-color: var(--primary-muted);
 }
 
-/* Danger Variant */
+/* Danger */
 .atom-button.danger {
-  background-color: var(--danger-color);
-  color: white;
+  background-color: rgba(217, 72, 72, 0.12);
+  color: var(--danger-color);
+  border: 1px solid rgba(217, 72, 72, 0.25);
 }
 .atom-button.danger:hover:not(:disabled) {
-  background-color: #dc2626; /* Darker red */
+  background-color: rgba(217, 72, 72, 0.2);
+  border-color: rgba(217, 72, 72, 0.4);
 }
 
-/* Ghost Variant */
+.atom-button.danger .spinner {
+  border-color: rgba(217, 72, 72, 0.2);
+  border-top-color: var(--danger-color);
+}
+
+/* Ghost */
 .atom-button.ghost {
   background-color: transparent;
   color: var(--text-secondary);
 }
 .atom-button.ghost:hover:not(:disabled) {
   color: var(--text-primary);
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.04);
 }
 </style>

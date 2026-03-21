@@ -1,55 +1,87 @@
+/* ── Local Fonts ────────────────────────────── */
+@font-face {
+  font-family: 'Young Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('@/assets/fonts/young-serif-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('@/assets/fonts/instrument-sans-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('@/assets/fonts/instrument-sans-italic.woff') format('woff');
+}
+
 :root {
-  /* Color Palette - Modern Deep Blue/Purple Theme */
-  --primary-color: #6366f1; /* Indigo 500 */
-  --primary-hover: #4f46e5; /* Indigo 600 */
-  --secondary-color: #ec4899; /* Pink 500 */
-  --secondary-hover: #db2777; /* Pink 600 */
-  --accent-color: #8b5cf6; /* Violet 500 */
+  /* ── Color Palette — Obsidian & Amber ────────────────── */
+  --primary-color: #d4a053;
+  --primary-hover: #e0b76a;
+  --primary-muted: rgba(212, 160, 83, 0.12);
+  --secondary-color: #7c8aaa;
+  --secondary-hover: #95a3c3;
+  --accent-color: #c07d53;
 
-  /* Surface Colors */
-  --bg-color: #0f172a; /* Slate 900 */
-  --bg-secondary: #1e293b; /* Slate 800 */
-  --bg-tertiary: #334155; /* Slate 700 */
+  /* Surfaces */
+  --bg-color: #0a0a0c;
+  --bg-secondary: #161619;
+  --bg-tertiary: #202025;
+  --bg-elevated: #2c2c33;
 
-  /* Text Colors */
-  --text-primary: #f8fafc; /* Slate 50 */
-  --text-secondary: #94a3b8; /* Slate 400 */
-  --text-tertiary: #64748b; /* Slate 500 */
+  /* Text */
+  --text-primary: #f2f2f2;
+  --text-secondary: #a3a3a8;
+  --text-tertiary: #77777e;
 
-  /* Functional Colors */
-  --success-color: #22c55e; /* Green 500 */
-  --warning-color: #eab308; /* Yellow 500 */
-  --danger-color: #ef4444; /* Red 500 */
-  --info-color: #3b82f6; /* Blue 500 */
+  /* Functional */
+  --success-color: #3eba6e;
+  --warning-color: #e5a83b;
+  --danger-color: #d94848;
+  --info-color: #5a8fd4;
 
-  /* Border & Outline */
-  --border-color: #334155; /* Slate 700 */
-  --border-focus: #6366f1; /* Indigo 500 */
+  /* Border */
+  --border-color: #333339;
+  --border-focus: #d4a053;
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
-    sans-serif;
-  --font-mono: 'Fira Code', monospace;
+  --font-display: 'Young Serif', Georgia, serif;
+  --font-sans: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Spacing */
-  --space-xs: 0.25rem; /* 4px */
-  --space-sm: 0.5rem; /* 8px */
-  --space-md: 1rem; /* 16px */
-  --space-lg: 1.5rem; /* 24px */
-  --space-xl: 2rem; /* 32px */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
 
   /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
   box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(212, 160, 83, 0.3);
+  color: var(--text-primary);
 }
 
 body {
@@ -64,20 +96,33 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  line-height: 1.2;
-  font-weight: 700;
+/* Grain texture overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  font-weight: 400;
   color: var(--text-primary);
   margin-top: 0;
+  letter-spacing: -0.01em;
 }
 
 h1 {
-  font-size: 2.5rem;
+  font-size: 2.75rem;
   margin-bottom: var(--space-lg);
 }
 h2 {
@@ -102,26 +147,25 @@ a {
 }
 a:hover {
   color: var(--primary-hover);
-  text-decoration: underline;
 }
 
-/* Scrollbar Styling */
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-color);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary);
-  border-radius: 4px;
+  background: var(--bg-elevated);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: var(--text-tertiary);
 }
 
 /* Utility Classes */
@@ -135,8 +179,6 @@ a:hover {
   background-color: var(--bg-secondary);
   border-radius: var(--radius-lg);
   padding: var(--space-xl);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--border-color);
 }
 
@@ -151,3 +193,44 @@ a:hover {
   margin-bottom: var(--space-md);
 }
 
+/* Stagger animation utilities */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

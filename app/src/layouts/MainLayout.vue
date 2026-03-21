@@ -4,14 +4,16 @@
 
     <main class="main-content">
       <div class="container">
-        <!-- The page content will be injected here -->
         <slot />
       </div>
     </main>
 
     <footer class="main-footer">
       <section class="container">
-        <p>© 2026 Vargo App. All rights reserved.</p>
+        <span class="footer-brand">Vargo</span>
+        <p class="footer-copy">
+          &copy; 2026
+        </p>
         <ul class="footer-links">
           <li><a href="#">Privacy</a></li>
           <li><a href="#">Terms</a></li>
@@ -36,19 +38,13 @@ import VargoNavbar from '../components/organisms/VargoNavbar.vue';
 
 .main-content {
   flex: 1;
-  padding: 2rem 0;
+  padding: 2.5rem 0;
 }
 
 .main-footer {
-  background-color: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
-  padding: 2rem 0;
+  padding: 1.5rem 0;
   margin-top: auto;
-
-  p {
-    margin: 0;
-    color: var(--text-tertiary);
-  }
 
   .container {
     display: flex;
@@ -58,14 +54,32 @@ import VargoNavbar from '../components/organisms/VargoNavbar.vue';
     gap: 1rem;
   }
 
+  .footer-brand {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--text-tertiary);
+    letter-spacing: -0.02em;
+  }
+
+  .footer-copy {
+    margin: 0;
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+  }
+
   .footer-links {
     display: flex;
     gap: 1.5rem;
     list-style: none;
+    padding: 0;
+    margin: 0;
 
     a {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
+      font-weight: 400;
+      text-decoration: none;
+      transition: color var(--transition-fast);
 
       &:hover {
         color: var(--primary-color);

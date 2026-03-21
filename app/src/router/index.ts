@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouterView } from 'vue-router';
-import HomePage from '../pages/HomePage.vue';
-import { useUserStore } from '../stores/user';
+import HomePage from '@/pages/HomePage.vue';
+import { useUserStore } from '@/stores/user';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,19 +9,19 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomePage,
-      meta: {
-        layout: 'MainLayout',
-        requiresAuth: true,
-      },
+      meta: { layout: 'MainLayout', requiresAuth: true },
     },
     {
       path: '/about',
       name: 'about',
-      component: () => import('../pages/AboutPage.vue'),
-      meta: {
-        layout: 'MainLayout',
-        requiresAuth: true,
-      },
+      component: () => import('@/pages/AboutPage.vue'),
+      meta: { layout: 'MainLayout', requiresAuth: true },
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/pages/ProfilePage.vue'),
+      meta: { layout: 'MainLayout', requiresAuth: true },
     },
     {
       path: '/auth',
@@ -32,38 +32,39 @@ const router = createRouter({
         {
           path: 'sign-in',
           name: 'sign-in',
-          component: () => import('../pages/auth/SignInPage.vue'),
+          component: () => import('@/pages/auth/SignInPage.vue'),
         },
         {
           path: 'sign-up',
           name: 'sign-up',
-          component: () => import('../pages/auth/SignUpPage.vue'),
+          component: () => import('@/pages/auth/SignUpPage.vue'),
         },
         {
           path: 'forgot-password',
           name: 'forgot-password',
-          component: () => import('../pages/auth/ForgotPasswordPage.vue'),
+          component: () => import('@/pages/auth/ForgotPasswordPage.vue'),
         },
       ],
     },
   ],
 });
 
-router.beforeEach((to, _from, next) => {
-  const isProtected = to.matched.some(
-    (record) => record.meta.requiresAuth === true
-  );
-  const isAuthRoute = to.matched.some((record) =>
-    record.path.startsWith('/auth')
-  );
-  const isAuthenticated = useUserStore().user !== null;
+router.beforeEach(async (to) => {
+  const userStore = useUserStore();
 
-  if (isProtected && !isAuthenticated) {
-    next({ name: 'sign-in' });
-  } else if (isAuthRoute && isAuthenticated) {
-    next({ name: 'home' });
-  } else {
-    next();
+  if (!userStore.isInitialized) {
+    await userStore.fetchUser();
+  }
+
+  const isProtected = to.matched.some((r) => r.meta.requiresAuth === true);
+  const isAuthRoute = to.matched.some((r) => r.path.startsWith('/auth'));
+
+  if (isProtected && !userStore.isAuthenticated) {
+    return { name: 'sign-in', query: { redirect: to.fullPath } };
+  }
+
+  if (isAuthRoute && userStore.isAuthenticated) {
+    return { name: 'home' };
   }
 });
 
