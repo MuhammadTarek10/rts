@@ -1,7 +1,12 @@
 {
     "cSpell.words": [
+        "Notivue",
+        "Persistedstate",
         "pgxpool",
         "skus",
         "Vargo"
-    ]
+    ],
+    "[vue]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
 }

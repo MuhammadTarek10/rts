@@ -17,14 +17,13 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-import { useToast } from '@/composables/useToast';
 import { getErrorMessage } from '@/utils/error';
 import SignUpForm from '@/components/organisms/SignUpForm.vue';
 import type { SignUpFormData } from '@/types';
+import { push } from 'notivue';
 
 const router = useRouter();
 const userStore = useUserStore();
-const toast = useToast();
 
 const isLoading = ref(false);
 const errorMessage = ref<string | null>(null);
@@ -35,11 +34,11 @@ const handleSignUp = async (payload: SignUpFormData) => {
 
   try {
     await userStore.signUp(payload);
-    toast.success('Account created successfully');
+    push.success('Account created successfully');
     router.push('/');
   } catch (err) {
     errorMessage.value = getErrorMessage(err);
-    toast.error(errorMessage.value);
+    push.error(errorMessage.value);
   } finally {
     isLoading.value = false;
   }

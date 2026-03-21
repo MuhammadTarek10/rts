@@ -54,7 +54,7 @@ api.interceptors.response.use(
       const { useUserStore } = await import('@/stores/user');
       const store = useUserStore();
       store.clearUser();
-      window.location.href = '/auth/sign-in';
+      globalThis.location.href = '/auth/sign-in';
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

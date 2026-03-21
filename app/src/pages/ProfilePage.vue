@@ -57,17 +57,16 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-import { useToast } from '@/composables/useToast';
 import { authService } from '@/services/auth.service';
 import { getErrorMessage } from '@/utils/error';
 import ProfileForm from '@/components/organisms/ProfileForm.vue';
 import ChangePasswordForm from '@/components/organisms/ChangePasswordForm.vue';
 import VargoButton from '@/components/atoms/VargoButton.vue';
 import type { UpdateProfilePayload, ChangePasswordPayload } from '@/types';
+import { push } from 'notivue';
 
 const router = useRouter();
 const userStore = useUserStore();
-const toast = useToast();
 
 const isUpdatingProfile = ref(false);
 const isChangingPassword = ref(false);
@@ -78,9 +77,9 @@ const handleUpdateProfile = async (payload: UpdateProfilePayload) => {
   try {
     const response = await authService.updateProfile(payload);
     userStore.setUser(response.data.data);
-    toast.success('Profile updated successfully');
+    push.success('Profile updated successfully');
   } catch (err) {
-    toast.error(getErrorMessage(err, 'Failed to update profile'));
+    push.error(getErrorMessage(err, 'Failed to update profile'));
   } finally {
     isUpdatingProfile.value = false;
   }
@@ -90,19 +89,19 @@ const handleChangePassword = async (payload: ChangePasswordPayload) => {
   isChangingPassword.value = true;
   try {
     await authService.changePassword(payload);
-    toast.success('Password changed. Please sign in again.');
+    push.success('Password changed. Please sign in again.');
     await userStore.signOut();
     router.push('/auth/sign-in');
   } catch (err) {
-    toast.error(getErrorMessage(err, 'Failed to change password'));
+    push.error(getErrorMessage(err, 'Failed to change password'));
   } finally {
     isChangingPassword.value = false;
   }
 };
 
 const handleDeleteAccount = async () => {
-  const confirmed = window.confirm(
-    'Are you sure you want to delete your account? This action cannot be undone.',
+  const confirmed = globalThis.confirm(
+    'Are you sure you want to delete your account? This action cannot be undone.'
   );
   if (!confirmed) return;
 
@@ -110,10 +109,10 @@ const handleDeleteAccount = async () => {
   try {
     await authService.deleteAccount();
     userStore.clearUser();
-    toast.success('Your account has been deleted');
+    push.success('Your account has been deleted');
     router.push('/auth/sign-in');
   } catch (err) {
-    toast.error(getErrorMessage(err, 'Failed to delete account'));
+    push.error(getErrorMessage(err, 'Failed to delete account'));
   } finally {
     isDeleting.value = false;
   }
@@ -153,9 +152,15 @@ const handleDeleteAccount = async () => {
   margin-bottom: 1.25rem;
   animation: fadeUp 0.5s ease both;
 
-  &:nth-child(2) { animation-delay: 0.05s; }
-  &:nth-child(3) { animation-delay: 0.1s; }
-  &:nth-child(4) { animation-delay: 0.15s; }
+  &:nth-child(2) {
+    animation-delay: 0.05s;
+  }
+  &:nth-child(3) {
+    animation-delay: 0.1s;
+  }
+  &:nth-child(4) {
+    animation-delay: 0.15s;
+  }
 }
 
 .section-title {

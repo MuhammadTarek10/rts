@@ -17,14 +17,13 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-import { useToast } from '@/composables/useToast';
 import { getErrorMessage } from '@/utils/error';
 import SignInForm from '@/components/organisms/SignInForm.vue';
 import type { SignInFormData } from '@/types';
+import { push } from 'notivue';
 
 const router = useRouter();
 const userStore = useUserStore();
-const toast = useToast();
 
 const isLoading = ref(false);
 const errorMessage = ref<string | null>(null);
@@ -39,12 +38,12 @@ const handleSignIn = async (payload: SignInFormData) => {
 
   try {
     await userStore.signIn(payload);
-    toast.success('Signed in successfully');
+    push.success('Signed in successfully');
     const redirect = router.currentRoute.value.query.redirect as string;
     router.push(redirect && isInternalRedirect(redirect) ? redirect : '/');
   } catch (err) {
     errorMessage.value = getErrorMessage(err, 'Invalid email or password');
-    toast.error(errorMessage.value);
+    push.error(errorMessage.value);
   } finally {
     isLoading.value = false;
   }

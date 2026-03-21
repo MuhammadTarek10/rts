@@ -13,13 +13,13 @@
   },
   "lint-staged": {
     "services/**/*.ts": [
-      "eslint --config services/auth/eslint.config.mjs --fix"
+      "eslint --fix"
     ],
     "app/**/*.ts": [
-      "eslint --config app/eslint.config.mjs --fix"
+      "eslint --fix"
     ],
     "app/**/*.vue": [
-      "eslint --config app/eslint.config.mjs --fix"
+      "eslint --fix"
     ],
     "services/**/*.go": [
       "gofumpt -w"

@@ -1,6 +1,6 @@
 {
     "[vue]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+        "editor.defaultFormatter": "Vue.volar"
     },
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
