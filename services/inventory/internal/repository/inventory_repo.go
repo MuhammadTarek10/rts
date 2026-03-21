@@ -92,7 +92,7 @@ func (r *InventoryRepository) List(ctx context.Context, filter domain.InventoryI
 	}
 
 	var conditions []string
-	var args []interface{}
+	var args []any
 	argIdx := 1
 
 	if filter.Status != "" {
