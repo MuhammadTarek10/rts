@@ -18,6 +18,12 @@ const router = createRouter({
       meta: { layout: 'MainLayout', requiresAuth: true },
     },
     {
+      path: '/status',
+      name: 'status',
+      component: () => import('@/pages/StatusPage.vue'),
+      meta: { layout: 'MainLayout', requiresAuth: true },
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: () => import('@/pages/ProfilePage.vue'),

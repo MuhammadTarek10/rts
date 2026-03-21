@@ -10,14 +10,12 @@
         </router-link>
         <div class="navbar-divider" />
         <ul class="navbar-links">
-          <li>
-            <router-link to="/">
-              Home
-            </router-link>
-          </li>
-          <li>
-            <router-link to="/about">
-              About
+          <li
+            v-for="item in NAVBAR_PAGES"
+            :key="item.link"
+          >
+            <router-link :to="item.link">
+              {{ item.title }}
             </router-link>
           </li>
         </ul>
@@ -50,6 +48,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
+import { NAVBAR_PAGES } from '@/constants/navbar';
 
 const router = useRouter();
 const userStore = useUserStore();
