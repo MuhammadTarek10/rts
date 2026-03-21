@@ -26,12 +26,6 @@ func New(props Props) http.Handler {
 
 	publicInventory := r.PathPrefix(InventoryAPI).Subrouter()
 
-	authInventory := r.PathPrefix(InventoryAPI).Subrouter()
-	authInventory.Use(auth)
-
-	adminInventory := r.PathPrefix(InventoryAPI).Subrouter()
-	adminInventory.Use(auth, middleware.RequireAdmin)
-
 	// --- Public routes ---
 	publicInventory.HandleFunc(RouteInventoryItems, props.InventoryHandler.ListItems).Methods(MethodGet)
 	publicInventory.HandleFunc(RouteInventoryItemBySKU, props.InventoryHandler.GetItemBySKU).Methods(MethodGet)
@@ -47,8 +41,14 @@ func New(props Props) http.Handler {
 	publicInventory.HandleFunc(RouteAvailabilityBySKU, props.AvailabilityHandler.GetAvailability).Methods(MethodGet)
 	publicInventory.HandleFunc(RouteAvailabilityBulk, props.AvailabilityHandler.BulkAvailability).Methods(MethodPost)
 
+	authInventory := r.PathPrefix(InventoryAPI).Subrouter()
+	authInventory.Use(auth)
+
 	// Authenticated-only (not necessarily admin)
 	authInventory.HandleFunc(RouteReservationsByOrderID, props.ReservationHandler.GetByOrderID).Methods(MethodGet)
+
+	adminInventory := r.PathPrefix(InventoryAPI).Subrouter()
+	adminInventory.Use(auth, middleware.RequireAdmin)
 
 	// --- Admin-protected routes ---
 	// Inventory write endpoints
