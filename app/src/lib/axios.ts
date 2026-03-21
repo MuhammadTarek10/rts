@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { APIS } from './apis';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
@@ -31,7 +32,9 @@ api.interceptors.response.use(
     if (
       error.response?.status !== 401 ||
       originalRequest._retry ||
-      originalRequest.url?.includes('/auth/refresh')
+      originalRequest.url?.includes(APIS.AUTH.REFRESH) ||
+      originalRequest.url?.includes(APIS.AUTH.SIGNIN) ||
+      originalRequest.url?.includes(APIS.AUTH.SIGNUP)
     ) {
       throw error;
     }
@@ -46,7 +49,7 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      await api.post('/auth/refresh');
+      await api.post(APIS.AUTH.REFRESH);
       processQueue(null);
       return api(originalRequest);
     } catch (refreshError) {
