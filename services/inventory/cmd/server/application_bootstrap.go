@@ -87,27 +87,33 @@ func initializeServices(
 		eventPublisher,
 	)
 
+	movementService := service.NewMovementService(
+		repositories.movement,
+		repositories.stock,
+		repositories.inventory,
+		redisCache,
+		eventPublisher,
+	)
+
+	reservationService := service.NewReservationService(
+		repositories.reservation,
+		repositories.stock,
+		repositories.inventory,
+		repositories.movement,
+		redisCache,
+		eventPublisher,
+	)
+
+	availabilityService := service.NewAvailabilityService(
+		repositories.stock,
+		redisCache,
+	)
+
 	return &Services{
-		inventory: inventoryService,
-		movement: service.NewMovementService(
-			repositories.movement,
-			repositories.stock,
-			repositories.inventory,
-			redisCache,
-			eventPublisher,
-		),
-		reservation: service.NewReservationService(
-			repositories.reservation,
-			repositories.stock,
-			repositories.inventory,
-			repositories.movement,
-			redisCache,
-			eventPublisher,
-		),
-		availability: service.NewAvailabilityService(
-			repositories.stock,
-			redisCache,
-		),
+		inventory:    inventoryService,
+		movement:     movementService,
+		reservation:  reservationService,
+		availability: availabilityService,
 	}
 }
 
@@ -122,16 +128,14 @@ func initializeHandlers(services *Services) *Handlers {
 }
 
 func initializeHTTPHandler(cfg *config.Config, handlers *Handlers) http.Handler {
-	apiHandler := router.New(
-		cfg.JWTAccessSecret,
-		cfg.SwaggerUsername,
-		cfg.SwaggerPassword,
-		handlers.inventory,
-		handlers.warehouse,
-		handlers.movement,
-		handlers.reservation,
-		handlers.availability,
-	)
+	apiHandler := router.New(router.Props{
+		JWTSecret:           cfg.JWTAccessSecret,
+		InventoryHandler:    handlers.inventory,
+		WarehouseHandler:    handlers.warehouse,
+		MovementHandler:     handlers.movement,
+		ReservationHandler:  handlers.reservation,
+		AvailabilityHandler: handlers.availability,
+	})
 
 	swaggerMux := http.NewServeMux()
 	swaggerMux.Handle("/swagger/", httpSwagger.Handler(

@@ -43,7 +43,7 @@ func JWTAuth(secret string) func(http.Handler) http.Handler {
 				return
 			}
 
-			token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+			token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, jwt.ErrSignatureInvalid
 				}
@@ -98,8 +98,8 @@ func RequireAdmin(next http.Handler) http.Handler {
 func extractToken(r *http.Request) string {
 	// Check Authorization header
 	auth := r.Header.Get("Authorization")
-	if strings.HasPrefix(auth, "Bearer ") {
-		return strings.TrimPrefix(auth, "Bearer ")
+	if after, ok := strings.CutPrefix(auth, "Bearer "); ok {
+		return after
 	}
 
 	// Check cookie

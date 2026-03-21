@@ -139,7 +139,7 @@ func (h *InventoryHandler) GetItemStock(w http.ResponseWriter, r *http.Request) 
 // @Failure 422 {object} middleware.ErrorResponse
 // @Failure 500 {object} middleware.ErrorResponse
 // @Security BearerAuth
-// @Router /inventory/items/{id} [put]
+// @Router /inventory/items/{id} [patch]
 func (h *InventoryHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	var input domain.UpdateInventoryItemInput
@@ -158,8 +158,8 @@ func (h *InventoryHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 
 // PaginatedResponse wraps list responses with pagination metadata.
 type PaginatedResponse struct {
-	Data     interface{} `json:"data"`
-	Total    int         `json:"total"`
-	Page     int         `json:"page"`
-	PageSize int         `json:"page_size"`
+	Data     any `json:"data"`
+	Total    int `json:"total"`
+	Page     int `json:"page"`
+	PageSize int `json:"page_size"`
 }

@@ -3,67 +3,81 @@ package router
 import (
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/rts/inventory/internal/handler"
 	"github.com/rts/inventory/internal/middleware"
 )
 
-func New(
-	jwtSecret string,
-	swaggerUser string,
-	swaggerPass string,
-	inventoryHandler *handler.InventoryHandler,
-	warehouseHandler *handler.WarehouseHandler,
-	movementHandler *handler.MovementHandler,
-	reservationHandler *handler.ReservationHandler,
-	availabilityHandler *handler.AvailabilityHandler,
-) http.Handler {
-	mux := http.NewServeMux()
+type Props struct {
+	JWTSecret           string
+	InventoryHandler    *handler.InventoryHandler
+	WarehouseHandler    *handler.WarehouseHandler
+	MovementHandler     *handler.MovementHandler
+	ReservationHandler  *handler.ReservationHandler
+	AvailabilityHandler *handler.AvailabilityHandler
+}
 
-	auth := middleware.JWTAuth(jwtSecret)
-	adminAuth := func(h http.HandlerFunc) http.Handler {
-		return auth(middleware.RequireAdmin(http.HandlerFunc(h)))
-	}
+// New sets up all routes, middleware, and handlers for the inventory service.
+func New(props Props) http.Handler {
+	r := mux.NewRouter().StrictSlash(true)
 
-	// Health check
-	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
-		middleware.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
-	})
+	// JWT middleware
+	auth := middleware.JWTAuth(props.JWTSecret)
 
-	// Inventory items (read endpoints are public, write requires admin)
-	mux.HandleFunc("GET /api/inventory/items", inventoryHandler.ListItems)
-	mux.HandleFunc("GET /api/inventory/items/sku/{sku}", inventoryHandler.GetItemBySKU)
-	mux.HandleFunc("GET /api/inventory/stock/{id}", inventoryHandler.GetItemStock)
-	mux.HandleFunc("GET /api/inventory/items/{id}", inventoryHandler.GetItem)
-	mux.Handle("PUT /api/inventory/items/{id}", adminAuth(inventoryHandler.UpdateItem))
+	publicInventory := r.PathPrefix(InventoryAPI).Subrouter()
+
+	adminInventory := r.PathPrefix(InventoryAPI).Subrouter()
+	adminInventory.Use(auth, middleware.RequireAdmin)
+
+	authInventory := r.PathPrefix(InventoryAPI).Subrouter()
+	authInventory.Use(auth)
+
+	// --- Public routes ---
+	publicInventory.HandleFunc(RouteInventoryItems, props.InventoryHandler.ListItems).Methods(MethodGet)
+	publicInventory.HandleFunc(RouteInventoryItemBySKU, props.InventoryHandler.GetItemBySKU).Methods(MethodGet)
+	publicInventory.HandleFunc(RouteInventoryItemByID, props.InventoryHandler.GetItem).Methods(MethodGet)
+	publicInventory.HandleFunc(RouteInventoryStockByID, props.InventoryHandler.GetItemStock).Methods(MethodGet)
+
+	publicInventory.HandleFunc(RouteMovements, props.MovementHandler.ListMovements).Methods(MethodGet)
+	publicInventory.HandleFunc(RouteMovementByID, props.MovementHandler.GetMovement).Methods(MethodGet)
+
+	publicInventory.HandleFunc(RouteWarehouses, props.WarehouseHandler.ListWarehouses).Methods(MethodGet)
+	publicInventory.HandleFunc(RouteWarehouseByID, props.WarehouseHandler.GetWarehouse).Methods(MethodGet)
+
+	publicInventory.HandleFunc(RouteAvailabilityBySKU, props.AvailabilityHandler.GetAvailability).Methods(MethodGet)
+	publicInventory.HandleFunc(RouteAvailabilityBulk, props.AvailabilityHandler.BulkAvailability).Methods(MethodPost)
+
+	// Authenticated-only (not necessarily admin)
+	authInventory.HandleFunc(RouteReservationsByOrderID, props.ReservationHandler.GetByOrderID).Methods(MethodGet)
+
+	// --- Admin-protected routes ---
+	// Inventory write endpoints
+	adminInventory.HandleFunc(RouteInventoryItemByID, props.InventoryHandler.UpdateItem).Methods(MethodPatch)
 
 	// Warehouses
-	mux.HandleFunc("GET /api/inventory/warehouses", warehouseHandler.ListWarehouses)
-	mux.HandleFunc("GET /api/inventory/warehouses/{id}", warehouseHandler.GetWarehouse)
-	mux.Handle("POST /api/inventory/warehouses", adminAuth(warehouseHandler.CreateWarehouse))
-	mux.Handle("PUT /api/inventory/warehouses/{id}", adminAuth(warehouseHandler.UpdateWarehouse))
-	mux.Handle("DELETE /api/inventory/warehouses/{id}", adminAuth(warehouseHandler.DeactivateWarehouse))
+	adminInventory.HandleFunc(RouteWarehouses, props.WarehouseHandler.CreateWarehouse).Methods(MethodPost)
+	adminInventory.HandleFunc(RouteWarehouseByID, props.WarehouseHandler.UpdateWarehouse).Methods(MethodPatch)
+	adminInventory.HandleFunc(RouteWarehouseByID, props.WarehouseHandler.DeactivateWarehouse).Methods(MethodDelete)
 
 	// Movements
-	mux.HandleFunc("GET /api/inventory/movements", movementHandler.ListMovements)
-	mux.HandleFunc("GET /api/inventory/movements/{id}", movementHandler.GetMovement)
-	mux.Handle("POST /api/inventory/movements/receive", adminAuth(movementHandler.Receive))
-	mux.Handle("POST /api/inventory/movements/ship", adminAuth(movementHandler.Ship))
-	mux.Handle("POST /api/inventory/movements/adjust", adminAuth(movementHandler.Adjust))
-	mux.Handle("POST /api/inventory/movements/transfer", adminAuth(movementHandler.Transfer))
-	mux.Handle("POST /api/inventory/movements/return", adminAuth(movementHandler.Return))
+	adminInventory.HandleFunc(RouteMovementReceive, props.MovementHandler.Receive).Methods(MethodPost)
+	adminInventory.HandleFunc(RouteMovementShip, props.MovementHandler.Ship).Methods(MethodPost)
+	adminInventory.HandleFunc(RouteMovementAdjust, props.MovementHandler.Adjust).Methods(MethodPost)
+	adminInventory.HandleFunc(RouteMovementTransfer, props.MovementHandler.Transfer).Methods(MethodPost)
+	adminInventory.HandleFunc(RouteMovementReturn, props.MovementHandler.Return).Methods(MethodPost)
 
-	// Reservations (all require auth)
-	mux.Handle("POST /api/inventory/reservations", adminAuth(reservationHandler.Reserve))
-	mux.Handle("POST /api/inventory/reservations/confirm", adminAuth(reservationHandler.Confirm))
-	mux.Handle("POST /api/inventory/reservations/release", adminAuth(reservationHandler.Release))
-	mux.Handle("GET /api/inventory/reservations/{order_id}", auth(http.HandlerFunc(reservationHandler.GetByOrderID)))
+	// Reservations
+	adminInventory.HandleFunc(RouteReservations, props.ReservationHandler.Reserve).Methods(MethodPost)
+	adminInventory.HandleFunc(RouteReservationsConfirm, props.ReservationHandler.Confirm).Methods(MethodPost)
+	adminInventory.HandleFunc(RouteReservationsRelease, props.ReservationHandler.Release).Methods(MethodPost)
 
-	// Availability (public)
-	mux.HandleFunc("GET /api/inventory/availability/{sku}", availabilityHandler.GetAvailability)
-	mux.HandleFunc("POST /api/inventory/availability/bulk", availabilityHandler.BulkAvailability)
+	// --- Health check ---
+	r.HandleFunc(RouteHealth, func(w http.ResponseWriter, r *http.Request) {
+		middleware.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+	}).Methods(MethodGet)
 
-	// Apply global middleware
-	var h http.Handler = mux
+	// --- Global middleware ---
+	var h http.Handler = r
 	h = middleware.Logging(h)
 
 	return h

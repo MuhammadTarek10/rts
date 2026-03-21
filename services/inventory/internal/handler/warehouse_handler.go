@@ -106,7 +106,7 @@ func (h *WarehouseHandler) CreateWarehouse(w http.ResponseWriter, r *http.Reques
 // @Failure 422 {object} middleware.ErrorResponse
 // @Failure 500 {object} middleware.ErrorResponse
 // @Security BearerAuth
-// @Router /inventory/warehouses/{id} [put]
+// @Router /inventory/warehouses/{id} [patch]
 func (h *WarehouseHandler) UpdateWarehouse(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	var input domain.UpdateWarehouseInput

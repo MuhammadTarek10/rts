@@ -10,7 +10,7 @@ RTS is a microservices monorepo with a polyglot backend and a Vue 3 frontend:
 | ------------------------- | ---------------------- | ------------------------ | ---------- |
 | `services/auth`           | NestJS (TypeScript)    | PostgreSQL (Drizzle ORM) | 3001       |
 | `services/catalog`        | ASP.NET Core (.NET 10) | MongoDB                  | 3002       |
-| `services/inventory`      | (planned)              | -                        | -          |
+| `services/inventory`      | Go (stdlib)            | PostgreSQL (go-migrate)  | 3004       |
 | `services/orders`         | (planned)              | -                        | -          |
 | `services/payment`        | (planned)              | -                        | -          |
 | `services/notification`   | (planned)              | -                        | -          |
@@ -69,6 +69,35 @@ dotnet test                     # run tests (solution-level)
 dotnet format Catalog.slnx      # format C# code
 ```
 
+## Inventory Service (`services/inventory`)
+
+Go service using only the standard library (`net/http`, `database/sql`). Manages warehouses, stock levels, reservations, and stock movements. Consumes catalog events from RabbitMQ to auto-create inventory items when products are created.
+
+**Architecture:** `cmd/server/` (entrypoint + bootstrap) + `internal/` (domain, handler, service, repository, consumer, publisher, middleware, cache, router).
+
+**API conventions:** JSON responses use `snake_case` field naming. JWT bearer auth validated using the shared secret from the auth service. Swagger UI at `/swagger/` (basic-auth protected).
+
+**Concurrency:** Background goroutines for AMQP catalog consumer, reservation expiry sweeper (30s tick), and graceful shutdown handler. `sync.Mutex` guards the AMQP publisher channel.
+
+**Migrations:** `golang-migrate` with SQL files in `migrations/`. Runs automatically on startup.
+
+```bash
+# Dev
+cd services/inventory
+docker compose up -d            # starts PostgreSQL on port 5433
+go run ./cmd/server             # starts the API on :8080
+
+# Tests
+go test ./...                   # all tests
+go test ./internal/repository/... -tags=integration  # integration tests (needs DB)
+
+# Swagger
+make swagger                    # regenerate docs (requires swag CLI)
+
+# Format
+gofumpt -w .
+```
+
 ## Frontend (`app`)
 
 Vue 3 + Vite + Pinia (with persisted state) + Vue Router. Written in TypeScript, styled with LESS.
@@ -93,7 +122,7 @@ docker compose up -d db mongo redis rabbitmq
 docker compose up -d --build catalog
 ```
 
-**Nginx gateway** routes `/api/auth/` → auth service. Catalog and other service routes are defined in `nginx/conf.d/default.conf`. MinIO console at `/minio/`, Grafana at `/grafana/`, RabbitMQ management at `/rabbitmq/`.
+**Nginx gateway** routes `/api/auth/` → auth service, `/api/catalog/` → catalog service, `/api/inventory/` → inventory service. Routes defined in `nginx/conf.d/default.conf`. MinIO console at `/minio/`, Grafana at `/grafana/`, RabbitMQ management at `/rabbitmq/`.
 
 ## Pre-commit Hooks
 
@@ -135,4 +164,5 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__chrome
 
 ## Important Notes
 
-After major changes on either services or frontend app, update their respective `README.md` file.
+- Update this file after any major changes
+- After major changes on either services or frontend app, update their respective `README.md` file.
