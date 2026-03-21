@@ -33,7 +33,7 @@ api.interceptors.response.use(
       originalRequest._retry ||
       originalRequest.url?.includes('/auth/refresh')
     ) {
-      return Promise.reject(error);
+      throw error;
     }
 
     if (isRefreshing) {
@@ -55,11 +55,11 @@ api.interceptors.response.use(
       const store = useUserStore();
       store.clearUser();
       globalThis.location.href = '/auth/sign-in';
-      return Promise.reject(refreshError);
+      throw refreshError;
     } finally {
       isRefreshing = false;
     }
-  },
+  }
 );
 
 export default api;
