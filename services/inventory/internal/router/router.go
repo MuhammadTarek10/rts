@@ -26,11 +26,11 @@ func New(props Props) http.Handler {
 
 	publicInventory := r.PathPrefix(InventoryAPI).Subrouter()
 
-	adminInventory := r.PathPrefix(InventoryAPI).Subrouter()
-	adminInventory.Use(auth, middleware.RequireAdmin)
-
 	authInventory := r.PathPrefix(InventoryAPI).Subrouter()
 	authInventory.Use(auth)
+
+	adminInventory := r.PathPrefix(InventoryAPI).Subrouter()
+	adminInventory.Use(auth, middleware.RequireAdmin)
 
 	// --- Public routes ---
 	publicInventory.HandleFunc(RouteInventoryItems, props.InventoryHandler.ListItems).Methods(MethodGet)
