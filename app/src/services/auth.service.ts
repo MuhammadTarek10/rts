@@ -1,3 +1,4 @@
+import { APIS } from '@/lib/apis';
 import api from '@/lib/axios';
 import type {
   ApiResponse,
@@ -10,23 +11,59 @@ import type {
 } from '@/types';
 
 export const authService = {
-  signIn: (payload: SignInPayload) =>
-    api.post<ApiResponse<TokenResponse>>('/auth/sign-in', payload),
+  signIn: async (payload: SignInPayload) => {
+    const response = await api.post<ApiResponse<TokenResponse>>(
+      APIS.AUTH.SIGNIN,
+      payload
+    );
+    return response.data;
+  },
 
-  signUp: (payload: SignUpPayload) =>
-    api.post<ApiResponse<TokenResponse>>('/auth/sign-up', payload),
+  signUp: async (payload: SignUpPayload) => {
+    const response = await api.post<ApiResponse<TokenResponse>>(
+      APIS.AUTH.SIGNUP,
+      payload
+    );
+    return response.data;
+  },
 
-  refresh: () => api.post<ApiResponse<TokenResponse>>('/auth/refresh'),
+  refresh: async () => {
+    const response = await api.post<ApiResponse<TokenResponse>>(
+      APIS.AUTH.REFRESH
+    );
+    return response.data;
+  },
 
-  signOut: () => api.post<ApiResponse<null>>('/auth/sign-out'),
+  signOut: async () => {
+    const response = await api.post<ApiResponse<null>>(APIS.AUTH.SIGNOUT);
+    return response.data;
+  },
 
-  getProfile: () => api.get<ApiResponse<User>>('/auth/users/profile'),
+  getProfile: async () => {
+    const response = await api.get<ApiResponse<User>>(APIS.AUTH.GET_PROFILE);
+    return response.data;
+  },
 
-  updateProfile: (payload: UpdateProfilePayload) =>
-    api.patch<ApiResponse<User>>('/auth/users/profile', payload),
+  updateProfile: async (payload: UpdateProfilePayload) => {
+    const response = await api.patch<ApiResponse<User>>(
+      APIS.AUTH.UPDATE_PROFILE,
+      payload
+    );
+    return response.data;
+  },
 
-  changePassword: (payload: ChangePasswordPayload) =>
-    api.patch<ApiResponse<null>>('/auth/users/change-password', payload),
+  changePassword: async (payload: ChangePasswordPayload) => {
+    const response = await api.patch<ApiResponse<null>>(
+      APIS.AUTH.CHANGE_PASSWORD,
+      payload
+    );
+    return response.data;
+  },
 
-  deleteAccount: () => api.delete<ApiResponse<null>>('/auth/users/me'),
+  deleteAccount: async () => {
+    const response = await api.delete<ApiResponse<null>>(
+      APIS.AUTH.DELETE_ACCOUNT
+    );
+    return response.data;
+  },
 };

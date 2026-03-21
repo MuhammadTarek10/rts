@@ -32,8 +32,8 @@ export const useUserStore = defineStore(
     async function fetchUser(): Promise<boolean> {
       try {
         isLoading.value = true;
-        const response = await authService.getProfile();
-        user.value = response.data.data;
+        const { data } = await authService.getProfile();
+        user.value = data;
         return true;
       } catch {
         clearUser();
@@ -80,5 +80,5 @@ export const useUserStore = defineStore(
   },
   {
     persist: true,
-  },
+  }
 );

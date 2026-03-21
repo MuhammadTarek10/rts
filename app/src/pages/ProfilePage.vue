@@ -75,8 +75,8 @@ const isDeleting = ref(false);
 const handleUpdateProfile = async (payload: UpdateProfilePayload) => {
   isUpdatingProfile.value = true;
   try {
-    const response = await authService.updateProfile(payload);
-    userStore.setUser(response.data.data);
+    const { data } = await authService.updateProfile(payload);
+    userStore.setUser(data);
     push.success('Profile updated successfully');
   } catch (err) {
     push.error(getErrorMessage(err, 'Failed to update profile'));
